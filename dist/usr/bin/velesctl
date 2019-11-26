@@ -1,0 +1,3 @@
+#!/bin/bash
+# Veles service manager control
+/usr/bin/supervisorctl -c  /etc/veles/velesctl.conf $1 $2

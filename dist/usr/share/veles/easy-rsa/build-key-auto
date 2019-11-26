@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Make a certificate/private key pair using a locally generated
+# root certificate.
+
+SCRIPT_PATH="/usr/share/veles/easy-rsa"
+#source "${SCRIPT_PATH}/vars" > /dev/null
+
+cd "${SCRIPT_PATH}" && source ./vars && "${SCRIPT_PATH}/pkitool" $*

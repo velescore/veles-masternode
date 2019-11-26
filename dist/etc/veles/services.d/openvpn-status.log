@@ -1,0 +1,12 @@
+OpenVPN CLIENT LIST
+Updated,Thu Nov 21 21:06:40 2019
+Common Name,Real Address,Bytes Received,Bytes Sent,Connected Since
+hackbok,127.0.0.1:45514,1283882,1250994,Thu Nov 21 20:54:40 2019
+hackbook,127.0.0.1:45580,27518,37614,Thu Nov 21 21:00:05 2019
+ROUTING TABLE
+Virtual Address,Common Name,Real Address,Last Ref
+10.100.0.6,hackbok,127.0.0.1:45514,Thu Nov 21 21:06:39 2019
+10.100.0.10,hackbook,127.0.0.1:45580,Thu Nov 21 21:06:25 2019
+GLOBAL STATS
+Max bcast/mcast queue length,2
+END

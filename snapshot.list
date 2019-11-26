@@ -1,0 +1,7 @@
+/etc/veles
+/usr/lib/veles
+/usr/share/veles
+/var/lib/veles/web
+/usr/bin/velesd
+/usr/bin/veles-cli
+/usr/bin/velesctl
