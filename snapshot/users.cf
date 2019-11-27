@@ -1,0 +1,7 @@
+# Username		Service name
+velesm-core		system.wallet.velesCoreDaemon
+velesmn-redis		system.db.redisServer
+velesmn-httpd		system.net.webServer
+velesmn-stunnel		system.net.tlsTunnel
+velesmn-obsf		system.net.obfsProxy
+velesmn-system		system

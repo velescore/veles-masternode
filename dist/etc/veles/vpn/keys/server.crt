@@ -1,35 +1,35 @@
 Certificate:
     Data:
         Version: 3 (0x2)
-        Serial Number: 6 (0x6)
+        Serial Number: 110 (0x6e)
         Signature Algorithm: sha256WithRSAEncryption
         Issuer: C=NT, ST=The Internet, L=Veles Network, O=Veles Core, OU=dVPN, CN=Veles Core dVPN CA/name=Veles dVPN/emailAddress=admin@veles.network
         Validity
-            Not Before: Nov 22 00:01:35 2019 GMT
-            Not After : Nov 19 00:01:35 2029 GMT
+            Not Before: Nov 27 16:28:31 2019 GMT
+            Not After : Nov 24 16:28:31 2029 GMT
         Subject: C=NT, ST=The Internet, L=Veles Network, O=Veles Core, OU=dVPN, CN=server/name=Veles dVPN Node/emailAddress=admin@veles.network
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
                 RSA Public-Key: (2048 bit)
                 Modulus:
-                    00:ec:36:d6:54:29:76:ab:77:c7:09:87:a6:21:6e:
-                    fc:73:d9:26:3a:f0:ba:72:22:98:67:e4:8b:0f:fa:
-                    2e:cb:6f:d8:3f:a4:f2:fd:7c:cd:6d:79:b7:be:e6:
-                    b3:04:76:5a:88:cd:d2:c4:1a:95:53:f8:0c:74:58:
-                    bf:fc:c5:3f:0b:cc:22:c5:bd:12:65:54:43:c5:b7:
-                    88:2e:2a:33:e5:ba:e6:e1:7a:e5:30:63:37:04:4e:
-                    5b:34:82:e4:14:1c:e1:3b:8f:3b:be:a2:78:36:60:
-                    6e:e8:f1:49:b3:b2:c5:6b:09:41:6a:1d:69:46:b4:
-                    65:ee:92:d0:59:fc:54:db:10:1e:74:6e:17:a2:f0:
-                    03:90:d0:f5:48:9d:a5:77:43:9b:ee:06:cf:77:ce:
-                    d6:d4:92:97:b6:d1:4a:26:19:59:77:3b:47:a0:6f:
-                    3e:d4:d2:52:87:c6:96:dc:7a:f4:d4:8a:8e:5d:39:
-                    f0:e4:c0:2d:60:12:ca:a9:ae:d4:08:ef:38:6e:14:
-                    fc:db:2d:85:e8:f0:dc:e9:73:3f:07:f5:0a:b7:e1:
-                    ce:82:59:5e:a2:49:c0:54:a1:4d:60:62:2c:98:df:
-                    54:c0:10:8a:f8:b1:97:4a:ed:da:9d:49:03:59:40:
-                    55:c8:56:ee:5c:b6:03:70:65:30:91:ae:97:3a:4f:
-                    2e:91
+                    00:c8:a3:ed:35:36:fd:64:74:0b:bf:52:49:b4:d9:
+                    73:0d:a8:07:bb:30:3d:6e:63:9a:65:b9:0d:3f:08:
+                    f5:9f:3b:b0:35:81:c9:f4:6b:0a:33:50:38:dc:50:
+                    71:28:68:f5:24:4d:90:c7:e8:81:dd:f7:f3:de:a9:
+                    f7:75:68:68:8b:1d:f2:08:f7:f3:e1:9a:f5:5e:63:
+                    6f:5d:39:ac:be:33:2a:22:41:63:d7:aa:6a:fd:62:
+                    c4:4e:49:50:30:e7:d6:90:a0:1b:4f:12:2f:b2:5c:
+                    72:7e:72:1e:4b:e5:a1:38:fb:6c:8f:c0:01:8c:ea:
+                    a7:8a:f2:13:a7:d8:96:c0:b7:76:85:f6:9c:25:67:
+                    3c:5c:c4:47:42:b4:10:1b:c5:8e:eb:8f:a4:82:cb:
+                    47:a0:b3:05:01:00:01:80:31:8f:43:6b:a4:46:91:
+                    f9:d6:5b:54:0e:2f:b1:5d:da:ed:ad:2b:16:81:ff:
+                    4c:bc:36:53:ff:96:68:f6:25:8a:9f:16:40:1b:f6:
+                    94:e9:f6:85:ea:29:e3:49:2a:e7:82:ac:a7:7a:fa:
+                    0b:ee:fc:fd:92:b1:9b:cf:16:e5:43:ba:a1:55:17:
+                    7c:6e:8d:c4:a0:05:07:7d:94:a6:ec:33:33:f4:24:
+                    39:0a:0c:c3:11:94:2f:72:99:2a:d2:10:e5:12:0c:
+                    9d:af
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: 
@@ -39,7 +39,7 @@ Certificate:
             Netscape Comment: 
                 Easy-RSA Generated Server Certificate
             X509v3 Subject Key Identifier: 
-                30:FC:E1:FE:09:86:32:EB:75:1C:ED:16:35:CD:68:DF:E5:AC:F0:FC
+                82:58:45:52:02:A0:5E:5B:71:6B:11:AC:F7:32:F9:E8:80:F1:38:A5
             X509v3 Authority Key Identifier: 
                 keyid:F9:A6:50:5C:FB:CD:FC:75:15:E4:CE:30:3A:DE:33:1D:21:3C:DE:CF
                 DirName:/C=NT/ST=The Internet/L=Veles Network/O=Veles Core/OU=dVPN/CN=Veles Core dVPN CA/name=Veles dVPN/emailAddress=admin@veles.network
@@ -52,50 +52,50 @@ Certificate:
             X509v3 Subject Alternative Name: 
                 DNS:server
     Signature Algorithm: sha256WithRSAEncryption
-         8c:f8:de:00:0a:d5:db:80:bd:1d:a2:d0:fe:bb:3d:d0:72:c1:
-         5b:64:17:8f:cf:59:d2:6d:df:f7:e3:7e:3f:f0:ef:f7:f0:03:
-         ce:c4:6b:37:86:01:b4:dc:ef:4a:84:e4:b4:20:d5:b8:6a:fb:
-         b0:fe:a1:40:2d:6d:df:ed:29:fe:34:bb:78:79:bb:67:a7:78:
-         d2:d0:d6:b8:83:cb:8e:e6:9e:e7:e1:5f:0b:0b:27:53:77:bf:
-         b3:e2:22:19:bb:49:24:84:32:3b:55:4d:71:98:9f:78:45:c8:
-         a2:1c:59:f6:f7:8a:fb:c4:90:83:f8:ed:51:6e:21:74:8f:85:
-         ec:01:dc:29:eb:ea:c2:cd:c6:db:59:f4:48:66:4d:a0:3a:58:
-         b3:ff:6e:1b:9d:00:00:96:a2:e4:b7:c0:42:33:ff:b9:de:53:
-         12:75:11:69:3c:e6:58:70:45:ab:b2:d1:9c:f4:d9:d3:86:49:
-         39:91:3a:f0:aa:f7:93:22:9a:b1:de:23:3d:c9:d5:7b:d0:93:
-         4a:0e:b7:0a:2b:ac:63:30:25:cc:04:5d:7c:ad:df:45:97:87:
-         84:97:74:3b:69:15:98:65:d4:15:99:ac:a1:cf:e6:6e:24:de:
-         9e:b0:b2:1f:66:c4:09:a5:28:3b:69:8a:67:77:2b:f6:97:28:
-         50:ee:b9:ae
+         0f:1a:7e:08:8d:47:05:21:fc:13:00:3a:fa:a8:69:d1:e6:07:
+         87:bc:f9:08:58:0b:a0:a1:39:b2:d7:c5:12:5e:2c:88:85:6b:
+         75:c7:01:97:c6:33:06:16:cb:00:f7:94:03:ee:a8:cc:82:49:
+         75:5f:b7:e4:5a:00:d2:73:82:09:67:04:84:c8:6a:2e:07:f1:
+         44:f9:0f:b7:fa:a3:56:40:0a:cf:a5:ae:1e:d5:f8:5c:72:82:
+         bb:83:fd:5b:4a:51:ef:19:ca:a4:fa:76:e2:79:78:3c:98:8d:
+         ca:c7:21:67:80:f1:e7:72:a4:31:f3:4b:de:02:23:e7:8c:78:
+         44:5a:1e:62:38:c5:22:6b:a6:88:dd:9e:c5:96:98:6c:a8:9c:
+         8a:14:6f:06:16:96:2b:a0:e2:71:34:b7:93:57:d6:07:4b:b6:
+         c0:34:41:55:9e:c9:a0:12:3a:47:10:68:73:24:ef:97:ee:48:
+         c6:4c:cc:01:61:36:45:b7:5e:52:a6:d7:ac:23:25:7e:b8:b8:
+         23:3d:59:8c:eb:c3:16:fe:39:0a:ce:0f:18:d5:b3:6e:0e:be:
+         67:ea:7d:2e:d6:37:c2:6e:af:df:cb:2c:e0:7e:13:5d:b6:63:
+         cd:49:84:74:a5:a9:b0:07:25:ed:93:b1:05:c1:a7:06:08:80:
+         ed:c0:a8:ce
 -----BEGIN CERTIFICATE-----
-MIIFiTCCBHGgAwIBAgIBBjANBgkqhkiG9w0BAQsFADCBtjELMAkGA1UEBhMCTlQx
+MIIFiTCCBHGgAwIBAgIBbjANBgkqhkiG9w0BAQsFADCBtjELMAkGA1UEBhMCTlQx
 FTATBgNVBAgTDFRoZSBJbnRlcm5ldDEWMBQGA1UEBxMNVmVsZXMgTmV0d29yazET
 MBEGA1UEChMKVmVsZXMgQ29yZTENMAsGA1UECxMEZFZQTjEbMBkGA1UEAxMSVmVs
 ZXMgQ29yZSBkVlBOIENBMRMwEQYDVQQpEwpWZWxlcyBkVlBOMSIwIAYJKoZIhvcN
-AQkBFhNhZG1pbkB2ZWxlcy5uZXR3b3JrMB4XDTE5MTEyMjAwMDEzNVoXDTI5MTEx
-OTAwMDEzNVowga8xCzAJBgNVBAYTAk5UMRUwEwYDVQQIEwxUaGUgSW50ZXJuZXQx
+AQkBFhNhZG1pbkB2ZWxlcy5uZXR3b3JrMB4XDTE5MTEyNzE2MjgzMVoXDTI5MTEy
+NDE2MjgzMVowga8xCzAJBgNVBAYTAk5UMRUwEwYDVQQIEwxUaGUgSW50ZXJuZXQx
 FjAUBgNVBAcTDVZlbGVzIE5ldHdvcmsxEzARBgNVBAoTClZlbGVzIENvcmUxDTAL
 BgNVBAsTBGRWUE4xDzANBgNVBAMTBnNlcnZlcjEYMBYGA1UEKRMPVmVsZXMgZFZQ
 TiBOb2RlMSIwIAYJKoZIhvcNAQkBFhNhZG1pbkB2ZWxlcy5uZXR3b3JrMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7DbWVCl2q3fHCYemIW78c9kmOvC6
-ciKYZ+SLD/ouy2/YP6Ty/XzNbXm3vuazBHZaiM3SxBqVU/gMdFi//MU/C8wixb0S
-ZVRDxbeILioz5brm4XrlMGM3BE5bNILkFBzhO487vqJ4NmBu6PFJs7LFawlBah1p
-RrRl7pLQWfxU2xAedG4XovADkND1SJ2ld0Ob7gbPd87W1JKXttFKJhlZdztHoG8+
-1NJSh8aW3Hr01IqOXTnw5MAtYBLKqa7UCO84bhT82y2F6PDc6XM/B/UKt+HOglle
-oknAVKFNYGIsmN9UwBCK+LGXSu3anUkDWUBVyFbuXLYDcGUwka6XOk8ukQIDAQAB
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyKPtNTb9ZHQLv1JJtNlzDagHuzA9
+bmOaZbkNPwj1nzuwNYHJ9GsKM1A43FBxKGj1JE2Qx+iB3ffz3qn3dWhoix3yCPfz
+4Zr1XmNvXTmsvjMqIkFj16pq/WLETklQMOfWkKAbTxIvslxyfnIeS+WhOPtsj8AB
+jOqnivITp9iWwLd2hfacJWc8XMRHQrQQG8WO64+kgstHoLMFAQABgDGPQ2ukRpH5
+1ltUDi+xXdrtrSsWgf9MvDZT/5Zo9iWKnxZAG/aU6faF6injSSrngqynevoL7vz9
+krGbzxblQ7qhVRd8bo3EoAUHfZSm7DMz9CQ5CgzDEZQvcpkq0hDlEgydrwIDAQAB
 o4IBpTCCAaEwCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMCBkAwNAYJYIZIAYb4
 QgENBCcWJUVhc3ktUlNBIEdlbmVyYXRlZCBTZXJ2ZXIgQ2VydGlmaWNhdGUwHQYD
-VR0OBBYEFDD84f4JhjLrdRztFjXNaN/lrPD8MIH2BgNVHSMEge4wgeuAFPmmUFz7
+VR0OBBYEFIJYRVICoF5bcWsRrPcy+eiA8TilMIH2BgNVHSMEge4wgeuAFPmmUFz7
 zfx1FeTOMDreMx0hPN7PoYG8pIG5MIG2MQswCQYDVQQGEwJOVDEVMBMGA1UECBMM
 VGhlIEludGVybmV0MRYwFAYDVQQHEw1WZWxlcyBOZXR3b3JrMRMwEQYDVQQKEwpW
 ZWxlcyBDb3JlMQ0wCwYDVQQLEwRkVlBOMRswGQYDVQQDExJWZWxlcyBDb3JlIGRW
 UE4gQ0ExEzARBgNVBCkTClZlbGVzIGRWUE4xIjAgBgkqhkiG9w0BCQEWE2FkbWlu
 QHZlbGVzLm5ldHdvcmuCFBjCRyacbjY6n0qkgnZpZydxWyrRMBMGA1UdJQQMMAoG
 CCsGAQUFBwMBMAsGA1UdDwQEAwIFoDARBgNVHREECjAIggZzZXJ2ZXIwDQYJKoZI
-hvcNAQELBQADggEBAIz43gAK1duAvR2i0P67PdBywVtkF4/PWdJt3/fjfj/w7/fw
-A87EazeGAbTc70qE5LQg1bhq+7D+oUAtbd/tKf40u3h5u2eneNLQ1riDy47mnufh
-XwsLJ1N3v7PiIhm7SSSEMjtVTXGYn3hFyKIcWfb3ivvEkIP47VFuIXSPhewB3Cnr
-6sLNxttZ9EhmTaA6WLP/bhudAACWouS3wEIz/7neUxJ1EWk85lhwRauy0Zz02dOG
-STmROvCq95MimrHeIz3J1XvQk0oOtworrGMwJcwEXXyt30WXh4SXdDtpFZhl1BWZ
-rKHP5m4k3p6wsh9mxAmlKDtpimd3K/aXKFDuua4=
+hvcNAQELBQADggEBAA8afgiNRwUh/BMAOvqoadHmB4e8+QhYC6ChObLXxRJeLIiF
+a3XHAZfGMwYWywD3lAPuqMyCSXVft+RaANJzgglnBITIai4H8UT5D7f6o1ZACs+l
+rh7V+FxygruD/VtKUe8ZyqT6duJ5eDyYjcrHIWeA8edypDHzS94CI+eMeERaHmI4
+xSJrpojdnsWWmGyonIoUbwYWliug4nE0t5NX1gdLtsA0QVWeyaASOkcQaHMk75fu
+SMZMzAFhNkW3XlKm16wjJX64uCM9WYzrwxb+OQrODxjVs24OvmfqfS7WN8Jur9/L
+LOB+E122Y81JhHSlqbAHJe2TsQXBpwYIgO3AqM4=
 -----END CERTIFICATE-----
