@@ -12,13 +12,13 @@ class VelesMNWebSync(object):
 		self.configparser.read(config_path)
 		self.daemon = velesrpc.VelesRPCClient(
 			self.config('rpchost', '127.0.0.1', 'veles_wallet'),
-			self.config('rpcport', '21337', 'veles_wallet'),
+			self.config('rpcport', '{{svc-port:system.wallet.velesCoreDaemon}}', 'veles_wallet'),
 			self.config('rpcuser', None, 'veles_wallet'),
 			self.config('rpcpassword', None, 'veles_wallet')
 		)
 		self.redis = redis.Redis(
 			host=self.config('host', '127.0.0.1', 'redis_db'),
-			port=self.config('port', '21345', 'redis_db'),
+			port=self.config('port', '{{svc-port:system.db.redisServer}}', 'redis_db'),
 			db=self.config('db', '0', 'redis_db')
 		)
 
@@ -76,7 +76,7 @@ class VelesMNWebSync(object):
 			mn_ip, mn_port = info[7].split(':')
 			#mn_ip = '127.0.0.1'
 			request_start = time.time()
-			status = self.send_service_query(mn_ip + ':21339')
+			status = self.send_service_query(mn_ip + ':{{svc-port:system.net.tlsTunnel}}')
 			request_end = time.time()
 			mn = {
 				'dapp_support': False,

@@ -90,7 +90,7 @@ class VelesMNWebServer(object):
 			#try:
 			wallet = velesrpc.VelesRPCClient(
 				self.config('rpchost', '127.0.0.1', 'veles_wallet'),
-				self.config('rpcport', '21337', 'veles_wallet'),
+				self.config('rpcport', '{{svc-port:system.wallet.velesCoreDaemon}}', 'veles_wallet'),
 				self.config('rpcuser', None, 'veles_wallet'),
 				self.config('rpcpassword', None, 'veles_wallet'),
 				)
@@ -156,13 +156,13 @@ class VelesMNWebServer(object):
 		task = asyncio.get_event_loop().create_server(
 			handler,
 			self.config('addr', '127.0.0.1'),
-			self.config('port', 21340)
+			self.config('port', {{svc-port:system.net.webServer}})
 			)
 		return task
 
 	def run(self):
 		loop = asyncio.get_event_loop()
-		print("Running Veles Core WebServer at %s:%s" % (self.config('addr', '127.0.0.1'), str(self.config('port', 21340))))
+		print("Running Veles Core WebServer at %s:%s" % (self.config('addr', '127.0.0.1'), str(self.config('port', {{svc-port:system.net.webServer}}))))
 		#try:
 		loop.run_until_complete(asyncio.gather(
 			self.http_handler_task()
