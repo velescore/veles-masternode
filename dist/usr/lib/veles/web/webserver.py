@@ -16,7 +16,7 @@ class VelesMNWebServer(object):
 		self.services = { 'vpn': velesvpn.VelesVPNService() }
 		self.redis = redis.Redis(
 			host=self.config('host', '127.0.0.1', 'redis_db'),
-			port=int(self.config('port', '{{svc-port:system.db.redisServer}}', 'redis_db')),
+			port=int(self.config('port', '21345', 'redis_db')),
 			db=self.config('db', '0', 'redis_db')
 		)
 
@@ -44,7 +44,7 @@ class VelesMNWebServer(object):
 			cert = crt_service.get_new_certificate()
 			text = str(crt_service.make_openvpn_config(cert))
 			headers = {
-				"Content-Type": "application/openvpn",
+				"Content-Type": "application/x-openvpn-profile",
 				"Content-Disposition": "attachment; filename=veles.ovpn"
 				}
 		elif method == 'getOpenVPNShieldedConfig':
@@ -97,7 +97,7 @@ class VelesMNWebServer(object):
 			#try:
 			wallet = velesrpc.VelesRPCClient(
 				self.config('rpchost', '127.0.0.1', 'veles_wallet'),
-				self.config('rpcport', '{{svc-port:system.wallet.velesCoreDaemon}}', 'veles_wallet'),
+				self.config('rpcport', '21337', 'veles_wallet'),
 				self.config('rpcuser', None, 'veles_wallet'),
 				self.config('rpcpassword', None, 'veles_wallet'),
 				)
@@ -156,7 +156,7 @@ class VelesMNWebServer(object):
 			#try:
 			wallet = velesrpc.VelesRPCClient(
 				self.config('rpchost', '127.0.0.1', 'veles_wallet'),
-				self.config('rpcport', '{{svc-port:system.wallet.velesCoreDaemon}}', 'veles_wallet'),
+				self.config('rpcport', '21337', 'veles_wallet'),
 				self.config('rpcuser', None, 'veles_wallet'),
 				self.config('rpcpassword', None, 'veles_wallet'),
 			)
@@ -225,13 +225,13 @@ class VelesMNWebServer(object):
 		task = asyncio.get_event_loop().create_server(
 			handler,
 			self.config('addr', '127.0.0.1'),
-			self.config('port', {{svc-port:system.net.webServer}})
+			self.config('port', 21340)
 			)
 		return task
 
 	def run(self):
 		loop = asyncio.get_event_loop()
-		print("Running Veles Core WebServer at %s:%s" % (self.config('addr', '127.0.0.1'), str(self.config('port', {{svc-port:system.net.webServer}}))))
+		print("Running Veles Core WebServer at %s:%s" % (self.config('addr', '127.0.0.1'), str(self.config('port', 21340))))
 		#try:
 		loop.run_until_complete(asyncio.gather(
 			self.http_handler_task()

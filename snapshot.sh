@@ -1,8 +1,8 @@
 #!/bin/bash
 # Makes snapshot from dev machine to files directory
-ROOT_PREFIX=""	# could be "" for /, "/srv", "/var/local" ...
-DIST_PREFIX="/root/veles-masternode/dist"
-DIST_OVER_PREFIX="/root/veles-masternode/dist-overlay"
+export ROOT_PREFIX=""	# could be "" for /, "/srv", "/var/local" ...
+export DIST_PREFIX="/root/veles-masternode/dist"
+LOG_FILE="./velesmn-install.log"
 
 unparse_ports() {
         while read line; do
@@ -105,8 +105,8 @@ apply_privileges() {
                 if $(echo $line | grep -v '#' > /dev/null); then
 			echo "[set permissions] ${file}: ${mode}"
 			echo "[set owner] ${file}: ${owner}"
-			chmod -R "${mode}" "${DIST_PREFIX}${file}"
-			chown -R "${owner}" "${DIST_PREFIX}${file}"
+			chmod -R "${mode}" "${file}"
+			chown -R "${owner}" "${file}"
                 fi
         done < snapshot/privileges.list
 }
@@ -135,7 +135,7 @@ install_apt_deps() {
 		echo " * Nothing to install, all apt dependencies satisfied"
 	else
 		echo " * Installing following apt packages: ${to_install}"
-		apt-get install --no-install-recommends -y "${to_install}"
+		apt-get install --no-install-recommends -y ${to_install}
 	fi
 }
 
@@ -154,17 +154,11 @@ install_pip3_deps() {
 		if echo "${installed}" | grep "${line}" > /dev/null; then
 			echo "yes"
 		else
-			to_install="${to_install} ${line}"
 			echo "no"
+			echo " * Installing python3 package ${line}"
+			pip3 install "${line}"
 		fi
         done < snapshot/pip3.dep
-
-	if [ "${to_install}" == "" ]; then
-		echo " * Nothing to install, all python3 dependencies satisfied"
-	else
-		echo " * Installing following python3 packages: ${to_install}"
-		pip3 install "${to_install}"
-	fi
 }
 
 install_git_deps() {
@@ -201,7 +195,7 @@ pre_install() {
 
 post_install() {
 	# Now 'dist' dir is the same as new ROOT_DIR here
-	DIST_PREFIX="${ROOT_PREFIX}"
+	export DIST_PREFIX="${ROOT_PREFIX}"
 
 	# Start post-install scripts
 	source snapshot/post_install.sh
@@ -213,12 +207,14 @@ setup_service() {
 }
 
 launch_service() {
+	systemctl stop veles-mn 2> /dev/null
 	systemctl start veles-mn
 }
 
 
 mn_backup() {
-	rm -r "${DIST_PREFIX}/*"
+	git rm -r "${DIST_PREFIX}"
+	mkdir "${DIST_PREFIX}"
 	copy_snapshot "${ROOT_PREFIX}" "${DIST_PREFIX}" "backup"
 	unparse_vars
 }
@@ -227,27 +223,37 @@ mn_restore() {
 	source "snapshot/config_dialog.sh"
 
 	pre_config_wizard "snapshot/vars.cf" || exit 0
-	parse_vars
-	install_users
-	apply_privileges > /dev/null
-	pre_install
-	copy_snapshot "${DIST_PREFIX}" "${ROOT_PREFIX}" "restore"
-	post_install
-	apply_privileges > /dev/null
+	wiz_info_tiny "Installing dependencies ..."
+	install_deps >> $LOG_FILE 2>&1
+	wiz_info_tiny "Preparing instalaltion files ..."
+	parse_vars >> $LOG_FILE 2>&1
+	wiz_info_tiny "Creating user accounts ..."
+	install_users >> $LOG_FILE 2>&1
+	#apply_privileges > /dev/null
+	wiz_info_tiny "Preparing installation files ..."
+	pre_install >> $LOG_FILE 2>&1	# | wiz progress
+	copy_snapshot "${DIST_PREFIX}" "${ROOT_PREFIX}" "restore" | wiz_progress
+	wiz_info "Generating new certificates ..."
+	post_install 	#| wiz progress
+	#apply_privileges > /dev/null
 	post_config_wizard || exit 0
-	apply_privileges
-	setup_service
-	launch_service
+	wiz_info_tiny "Setting up file privileges ..."
+	apply_privileges | wiz_progress
+	wiz_info_tiny "Setting up systemd service ..."
+	setup_service >> $LOG_FILE 2>&1
+	wiz_info_tiny "Launching systemd service ..."
+	launch_service >> $LOG_FILE 2>&1
 	first_run_wizard || exit 0
 }
 
 copy_snapshot() {
 	src_prefix="${1}"
 	dst_prefix="${2}"
+	mode="${3}"
 
 	while read path; do
 		if [ -d "${src_prefix}${path}" ]; then
-			mkdir -p "${dst_prefix}${path}" > /dev/null
+			mkdir -p "${dst_prefix}${path}" 2> /dev/null
 			cp -av "${src_prefix}${path}/" $(dirname "${dst_prefix}${path}/")
 		else
 			mkdir -p $(dirname "${dst_prefix}${path}") > /dev/null
@@ -256,15 +262,19 @@ copy_snapshot() {
 	done < snapshot/snapshot.list
 
 	while read path; do
+                # if we're creating new package, remove what needs to be excluded
+		# we need to do this because we use recursive cp copy. And speed
+		# for a development script that takes about a second is no issue
+                if [[ "${3}" == "backup" ]]; then
+                        rm -r "${dst_prefix}${path}" 2> /dev/null
+                fi
+        done < snapshot/exclude.list
+
+	while read path; do
 		if [ "${path}" == "" ] || [ "${path}" == "/" ] || [ "${path}" == "." ]; then
 			continue
 		fi
-
-		# if dir exists, make it empty after backup
-		if [ "${3}" == "backup" ] && [[ -d "${dst_prefix}${path}" ]]; then
-			rm -r "${dst_prefix}${path}"
-		fi
-		mkdir -p "${dst_prefix}${path}" > /dev/null
+		mkdir -p "${dst_prefix}${path}" 2> /dev/null
 
 	done < snapshot/empty-dirs.list
 }
@@ -273,7 +283,7 @@ show_help() {
 	echo "Veles Masternode snapshot installation manager"
 	echo -e "Usage: snapshot.sh [action]\n\nActions:"
 	echo -e "install\t\t\tinstalls Veles MN system snapshot to local system"
-	echo -e "parse_vars\t\\treplace template variables to real values in snapshot"
+	echo -e "\nDebugging actions:\nparse_vars\t\\treplace template variables to real values in snapshot"
 	echo -e "unparse_vars\t\treplace real values to template variables in snapshot"
 	echo -e "install_users\t\tadds neccessary user accounts"
 	echo -e "apply_privileges\tapplies needed file/directory permissions and ownership"

@@ -33,9 +33,45 @@ function valid_ip()
     return $stat
 }
 
+mn_dialog() {
+	dialog --backtitle "${BACKTITLE}" --title "${TITLE}" "$@"
+}
+
+wiz_progress() {
+	mn_dialog --progressbox 15 65
+}
+
+wiz_progress_wait() {
+	mn_dialog --programbox 15 65
+}
+
+wiz_info() {
+	mn_dialog --infobox "${1}" 8 45
+}
+
+wiz_info_tiny() {
+	mn_dialog --infobox "${1}" 3 40
+}
+
+wiz_message() {
+	mn_dialog --msgbox "${1}" 10 57
+}
+
 install_dialog_deps() {
+	if ! dpkg --get-selections | grep "gawk" > /dev/null; then
+		echo " * Installing dependencies: gawk ..."
+		apt-get install --no-install-recommends -y gawk
+	fi
+	if ! dpkg --get-selections | grep "sed" > /dev/null; then
+		echo " * Installing dependencies: sed ..."
+		apt-get install --no-install-recommends -y sed
+	fi
+	if ! dpkg --get-selections | grep "psmisc" > /dev/null; then
+		echo " * Installing dependencies: psmisc ..."
+		apt-get install --no-install-recommends -y psmisc
+	fi
 	if ! dpkg --get-selections | grep "dialog" > /dev/null; then
-		echo " * Installing dependencies of the installator ..."
+		echo " * Installing dependencies: dialog ..."
 		apt-get install --no-install-recommends -y dialog
 	fi
 }
@@ -106,38 +142,66 @@ pre_config_wizard() {
 
 	# Reinstall
 	if [ -f /usr/bin/velesctl ]; then
-		reinstall_msg="Choose [Next] to reinstall existing Veles Core Masternode on this system. The process will also: reset all Veles Core configuration"
+		reinstall_msg="Choose [Next] to reinstall existing Veles Core Masternode on this system. The process will also: reset Veles Core configuration"
 
 		if ps aux | grep "/velesd" | grep -v grep > /dev/null; then
-			reinstall_msg="${reinstall_msg}, stop all running velesd instances"
+			reinstall_msg="${reinstall_msg}, and stop all running velesd instances."
 		fi
 
-		if [ -f "${WALLET_DIR}/wallet.dat" ]; then
-			reinstall_msg="${reinstall_msg}, move your previous wallet to backup location"
-		fi
+		#if [ -f "${WALLET_DIR}/wallet.dat" ]; then
+		#	reinstall_msg="${reinstall_msg}, move your previous wallet to backup location"
+		#fi
 
 		dialog --backtitle "${BACKTITLE}" --title "${TITLE} [Warning]" --yesno "${reinstall_msg}" 10 60 || return 1
-		killall velesd
 
-		# Wallet backup
-		if [ -f "${WALLET_DIR}/wallet.dat" ]; then
-			#dialog --yes-label "Next" --no-label "Exit" --backtitle "${BACKTITLE}" --title "${TITLE}" --yesno "Your current wallet will be backed up and moved to: ${BACKUP_DIR}. Choose [Next] to continue." 8 60 || return 1
-			if [ -d "${BACKUP_DIR}" ]; then
-				mv "${BACKUP_DIR}" "${BACKUP_DIR}.2"
-			fi
-			cp -a "${WALLET_DIR}" "${BACKUP_DIR}"
-		fi
+		# Stop all or running services
+		mn_dialog --infobox 'Stopping current Veles Core Masternode services...' 3 45
+		velesctl stop all | wiz_progress
+		systemctl stop veles-mn #| wiz_progress
+		# Just to be reallly sure
+		killall velesd 2> /dev/null
+		killall openvpn 2> /dev/null
+		killall redis-server 2> /dev/null
+		killall stunnel4 2> /dev/null
 	else
 		# Welcome / exit
-		dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --yes-label "Next" --no-label "Exit" --yesno 'Choose [Next] to install Veles Core Masternode on this system. It will require public IP address with access to public ports 443,21337 as well as local privileged port 53' 8 60 || return 1
+		mn_dialog --yes-label "Next" --no-label "Exit" --yesno 'Choose [Next] to install Veles Core Masternode 2nd gen. on this system. It will require public IP address with access to public ports 53,443 and 21337' 8 60 || return 1
+	fi
+
+
+	# Wallet backup
+	if [ -f "${WALLET_DIR}/wallet.dat" ]; then
+		timestamp=$(date +%s)
+		mkdir "${BACKUP_DIR}" 2> /dev/null
+		cp -au "${WALLET_DIR}" "${BACKUP_DIR}"/data
+		cp -a "${WALLET_DIR}/wallet.dat" "${BACKUP_DIR}/wallet.dat.${timestamp}"
+		cp -a "${WALLET_DIR}/wallet.dat" "${BACKUP_DIR}/wallet.dat"
+
+		choice="Next"
+		dialog --yes-label "Next" --no-label "Keep old" --backtitle "${BACKTITLE}" --title "${TITLE}" --yesno "Choose [Next] to continue with new velesd datadir and import your current wallet, or keep old datadir (possibly unsafe) but might be faster to sync. Your current wallet file has been backed up to: ${BACKUP_DIR}." 10 60 || choice="Keep"
+
+		if [[ "${choice}" == "Next" ]] && [ -f "${BACKUP_DIR}/wallet.dat" ]; then
+			mn_dialog --infobox 'Cleaning datadir and importing wallet ...' 3 50
+			rm -r "${WALLET_DIR}/*"
+			cp -a "${BACKUP_DIR}/wallet.dat" "${WALLET_DIR}"
+		fi
+	fi
+
+	# Upgrade from 1st gen
+	if [ -f /etc/systemd/system/veles.service ]; then
+		mn_dialog --infobox 'Stopping previous Veles Core daemon ...' 3 40
+		systemctl stop veles
+		killall velesd >/dev/null
+		mn_dialog --infobox 'Disabling previous Veles Core service ...' 3 40
+		systemctl disable veles
 	fi
 
 	# Server ip dialog
-	dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Looking up external IP address ...' 8 55
+	mn_dialog --infobox 'Looking up external IP address ...' 8 55
 	server_ip=$(find_public_ip)
 
 	if valid_ip "${server_ip}"; then
-		dialog --backtitle "$BACKTITLE" --title "$TITLE" --yes-label "Next" --no-label "Change" --yesno "External IP address detected: ${server_ip}, choose Next to use it for the current installation" 8 55 || server_ip=""
+		mn_dialog --yes-label "Next" --no-label "Change" --yesno "External IP address detected: ${server_ip}, choose Next to use it for the current installation" 8 55 || server_ip=""
 	fi
 
 	if ! valid_ip "${server_ip}"; then
@@ -145,11 +209,11 @@ pre_config_wizard() {
 	fi
 
 	while ! valid_ip "${server_ip}"; do
-		dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --msgbox 'You need to enter a valid public IP address' 8 40
+		mn_dialog --msgbox 'You need to enter a valid public IP address' 8 40
 		server_ip=$(dialog --stdout --backtitle "${BACKTITLE}" --inputbox "Enter your server's public IP address:" 8 50)
 
 		if [[ $server_ip == '' ]]; then
-			dialog --backtitle "$BACKTITLE" --title "$TITLE" --yesno "Do you wish to exit and cancel the installation?" 8 50 && return 1
+			mn_dialog --yesno "Do you wish to exit and cancel the installation?" 8 50 && return 1
 		fi
 	done
 
@@ -157,7 +221,7 @@ pre_config_wizard() {
 	mnkey=$(find_mn_key)
 
 	if [[ "$mnkey" != '' ]]; then
-		dialog --backtitle "$BACKTITLE" --title "$TITLE" --yesno "Previous Veles Masternode Private Key has been found: ${mnkey}  Do you wish to use it for current installation?" 10 57 || mnkey=""
+		mn_dialog --yesno "Previous Veles Masternode Private Key has been found: ${mnkey}  Do you wish to use it for current installation?" 10 57 || mnkey=""
 	fi
 
 	if [[ "$mnkey" == '' ]]; then
@@ -173,7 +237,7 @@ pre_config_wizard() {
 		length=${#mnkey}
 	done
 
-	echo "# Autogenerated by Veles Core Masternode installation program" > $vars_file
+	echo "# Settings generated by Veles Core Masternode Installator:" > $vars_file
 	echo -e "server_ip\t\t${server_ip}" >> $vars_file
 	echo -e "velesd:rpcuser\t\t"$(get_random_alnum $((12 + RANDOM % 5))) >> $vars_file
 	echo -e "velesd:rpcpassword\t"$(get_random_alnum $((40 + RANDOM % 10))) >> $vars_file
@@ -182,67 +246,106 @@ pre_config_wizard() {
 	echo -e "velesctl:rpcpassword\t"$(get_random_alnum $((40 + RANDOM % 10))) >> $vars_file
 
 	# Just show the info
-	echo -e "\n\n### Following configuration have been generated for the installation:"
-	cat $vars_file | grep -v "#"
-	echo -e "### (Masternode key will be set in later stage)\n"
+	cat $vars_file | wiz_progress_wait
 
 	return 0
 }
 
 post_config_wizard() {
-	if [ -f "${BACKUP_DIR}/wallet.dat" ]; then
+	if [ -f "/home/veles/.veles/wallet.dat" ] && [ ! "${WALLET_DIR}/wallet.dat" ]; then
 		choice="YES"
-		dialog --backtitle "$BACKTITLE" --title "$TITLE" --yes-label "Next" --no-label "Skip" --yesno "Press Next to import wallet from previous installation. If skipped it will be found in: ${BACKUP_DIR}/wallet.dat" 10 55 && choice="YES" || choice="NO"
+		mn_dialog --yes-label "Next" --no-label "Skip" --yesno "Press Next to import wallet from previous generation of Veles Core Masternode." 10 55 && choice="YES" || choice="NO"
 
 		if [[ $choice == "YES" ]]; then
-			dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Stopping Veles Core daemon ...' 3 40
+			mn_dialog --infobox 'Restarting Veles Core: Stopping daemon...' 4 45
 			velesctl stop system.wallet.velesCoreDaemon > /dev/null
-			cp -a "${BACKUP_DIR}/wallet.dat" "${WALLET_DIR}/"
-			dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Starting Veles Core daemon ...' 3 40
+			cp -a "/home/veles/.veles/wallet.dat" "${WALLET_DIR}/"
+			mn_dialog --infobox 'Restarting Veles Core: Sarting daemon... (this might take a while)' 4 45
 			velesctl start system.wallet.velesCoreDaemon > /dev/null
 		fi
 	fi
+	#elif [ -f "${BACKUP_DIR}/wallet.dat" ]; then
+	#	choice="YES"
+	#	mn_dialog --yes-label "Next" --no-label "Skip" --yesno "Press Next to import wallet from previous installation. If skipped it will be found in: ${BACKUP_DIR}/wallet.dat" 10 55 && choice="YES" || choice="NO"
+
+	#	if [[ $choice == "YES" ]]; then
+	#		mn_dialog --infobox 'Restarting Veles Core: Stopping daemon ...' 4 45
+	#		velesctl stop system.wallet.velesCoreDaemon > /dev/null
+	#		cp -a "${BACKUP_DIR}/wallet.dat" "${WALLET_DIR}/"
+	#		mn_dialog --infobox 'Restarting Veles Core: Sarting daemon ... (this might take a while)' 4 45
+	#		velesctl start system.wallet.velesCoreDaemon > /dev/null
+	#	fi
+	#fi
 
 	return 0
 }
 
 first_run_wizard() {
+		mn_dialog --infobox 'Starting Veles Masternode services ...' 4 35
+		mn_dialog --tailbox /var/lib/veles/wallet/debug.log 20 165 || mn_dialog --infobox 'Loading Veles Core daemon ... ' 4 45 &
+
 		while velesctl status system.wallet.velesCoreDaemon | grep STARTING > /dev/null; do
-			dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Veles Core daemon is starting, please wait ...' 8 50
-			sleep 10
+			sleep 5
 		done
+		killall dialog
 
 		if velesctl status system.wallet.velesCoreDaemon | grep RUNNING > /dev/null; then
 			if grep MASTERNODE_KEY_UNSET /etc/veles/veles.conf > /dev/null; then
 				mnkey=$(veles-cli masternode genkey)
+				mn_dialog --infobox 'Loading Veles Core wallet... ' 4 45
 
 				while ! check_mn_key ${mnkey}; do
-					dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Veles Core wallet is getting ready, please wait ...' 8 50
+					mn_dialog --tailbox /var/lib/veles/wallet/debug.log 20 165 &
 					sleep 10
 					mnkey=$(veles-cli masternode genkey)
 				done
+				killall dialog
 
 				if check_mn_key ${mnkey}; then
-					dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --msgbox 'Your new Masternode Private Key is: ${mnkey}' 8 56
+					mn_dialog --msgbox "Your new Masternode Private Key is: ${mnkey}" 8 56
 					echo -e "\n\n### Your new Masternode Private Key is: ${mnkey} ###\n"
-					dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Stopping Veles Core daemon ...' 3 40
+					mn_dialog --infobox 'Restarting Veles Core: Stopping daemon ... ' 4 45
 					velesctl stop system.wallet.velesCoreDaemon > /dev/null
-					dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Patching /etc/veles/veles.conf ...' 3 40
-					sed -i "s/#masternodeprivkey=/masternodeprivkey=/g" /etc/veles/veles.conf
-					sed -i 's/MASTERNODE_KEY_UNSET/${mnkey}/g' /etc/veles/veles.conf
-					sed -i 's/masternode=0/masternode=1/g' /etc/veles/veles.conf
-					dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Starting Veles Core daemon ...' 3 40
+					mn_dialog --infobox 'Patching /etc/veles/veles.conf ...' 3 40
+					sed -i "s/[# ]masternodeprivkey=MASTERNODE_KEY_UNSET/masternodeprivkey=${mnkey}/g" /etc/veles/veles.conf
+					sed -i 's/[# ]masternode=0/masternode=1/g' /etc/veles/veles.conf
+					mn_dialog --infobox 'Restarting Veles Core: Sarting daemon ... (this might take a while)' 4 45
 					velesctl start system.wallet.velesCoreDaemon > /dev/null
 				else
-					dialog --backtitle "${BACKTITLE}" --title "${TITLE}: Error" --msgbox 'Failed to generate Masternode Private Key, please check in /var/log/veles/' 8 56
+					if [ -f /var/lib/veles/wallet/debug.log ]; then
+						dialog --backtitle "${BACKTITLE}" --title "${TITLE}: Error" --msgbox 'Failed to generate Masternode Private Key, please check wallet log' 8 56
+						mn_dialog --tailbox /var/lib/veles/wallet/debug.log 10 100
+					else
+						dialog --backtitle "${BACKTITLE}" --title "${TITLE}: Error" --msgbox 'Failed to generate Masternode Private Key, please check in /var/log/veles/' 8 56
+					fi
 				fi
 			fi
 		else
-			dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --infobox 'Veles Core daemon is not running, please check in /var/log/veles/' 8 50
-			return 1
+			# Try one last time
+			sleep 10
+			mn_dialog --infobox 'Waiting for Veles Core daemon ...' 3 40
+
+			if velesctl status system.wallet.velesCoreDaemon | grep RUNNING > /dev/null || velesctl status system.wallet.velesCoreDaemon | grep STARTING > /dev/null; then
+				first_run_wizard
+			else
+				mn_dialog --infobox 'Veles Core daemon is not running, please check wallet logs' 8 50
+				if [ -f /var/lib/veles/wallet/debug.log ]; then
+					mn_dialog --tailbox /var/lib/veles/wallet/debug.log 10 100
+
+				elif [ -f /var/log/veles/velesctl.log ]; then
+					mn_dialog --tailbox /var/lib/veles/wallet/debug.log 10 100
+				fi
+				return 1
+			fi
 		fi
 
-	dialog --backtitle "${BACKTITLE}" --title "${TITLE}" --ok-label "Finish" --msgbox 'Veles Core Masternode 2nd gen. has been succesfully installed! Check your node status anytime by typing: "veles-cli masternode status" and the state of all sub-services using "velesctl status": ' 10 55
-	return 0
+	if velesctl status | grep FATAL; then
+		mn_dialog --ok-label "Show report" --msgbox 'Some of the services has failed to start, please check which ones on the following screen and see service logs in /var/log/veles/services.d for more information' 10 55
+		velesctl status | mn_dialog --programbox 15 65
+		exit 1
+	else
+		mn_dialog --ok-label "Finish" --msgbox 'Veles Core Masternode 2nd gen. has been succesfully installed! Check your node status anytime by typing: "veles-cli masternode status" and the state of all sub-services using "velesctl status": ' 10 55
+		exit 0
+	fi
 }
 
