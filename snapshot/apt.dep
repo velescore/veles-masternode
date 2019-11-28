@@ -1,0 +1,11 @@
+# Packages that needs to be installed through apt
+supervisor
+ufw
+sslh
+redis-server
+openvpn
+stunnel4
+dnsmasq
+python3
+python3-pip
+obfsproxy

@@ -1,7 +1,9 @@
 /etc/veles
+/etc/systemd/system/veles-mn.service
 /usr/lib/veles
+/usr/libexec/veles
 /usr/share/veles
-/var/lib/veles/web
 /usr/bin/velesd
 /usr/bin/veles-cli
 /usr/bin/velesctl
+/var/lib/veles/web

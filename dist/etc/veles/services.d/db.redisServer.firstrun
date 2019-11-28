@@ -1,0 +1,6 @@
+# Create /run dir
+if [ ! -d /var/run/veles/redis ]; then
+	mkdir /var/run/veles/redis
+fi
+chown {{svc-user:system.db.redisServer}} /var/run/veles/redis
+chmod 750 /var/run/veles/redis

@@ -1,0 +1,7 @@
+# Create /run dir
+if [ ! -d /var/run/veles/stunnel ]; then
+	mkdir /var/run/veles/stunnel
+fi
+chown {{svc-user:system.net.tlsTunnel}} /var/run/veles/stunnel
+chmod 750 /var/run/veles/stunnel
+
