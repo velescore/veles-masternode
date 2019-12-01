@@ -12,7 +12,7 @@ class VelesMNWebSync(object):
 		self.configparser.read(config_path)
 		self.daemon = velesrpc.VelesRPCClient(
 			self.config('rpchost', '127.0.0.1', 'veles_wallet'),
-			self.config('rpcport', '21337', 'veles_wallet'),
+			self.config('rpcport', '{{svc-port:system.wallet.velesCoreDaemon}}', 'veles_wallet'),
 			self.config('rpcuser', None, 'veles_wallet'),
 			self.config('rpcpassword', None, 'veles_wallet'),
 			)
@@ -45,7 +45,7 @@ class VelesMNWebSync(object):
 			mn_ip, mn_port = mn_addr.split(':')
 			#mn_ip = '127.0.0.1'
 			print('Checking masternode %s' % mn_ip)
-			status = self.send_service_query(mn_ip + ':21339')	#('80.211.5.147')
+			status = self.send_service_query(mn_ip + ':{{svc-port:system.net.tlsTunnel}}')	#('80.211.5.147')
 
 			try:
 				status_name = self.daemon.rpc_call('masternodelist', ['status', output])[output]

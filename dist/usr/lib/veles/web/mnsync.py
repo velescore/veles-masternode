@@ -76,7 +76,7 @@ class VelesMNWebSync(object):
 			mn_ip, mn_port = info[7].split(':')
 			#mn_ip = '127.0.0.1'
 			request_start = time.time()
-			status = self.send_service_query(mn_ip + ':21339')
+			status = self.send_service_query(mn_ip + ':443')
 			request_end = time.time()
 			mn = {
 				'dapp_support': False,

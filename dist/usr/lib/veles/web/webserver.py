@@ -44,7 +44,7 @@ class VelesMNWebServer(object):
 			cert = crt_service.get_new_certificate()
 			text = str(crt_service.make_openvpn_config(cert))
 			headers = {
-				"Content-Type": "application/openvpn",
+				"Content-Type": "application/x-openvpn-profile",
 				"Content-Disposition": "attachment; filename=veles.ovpn"
 				}
 		elif method == 'getOpenVPNShieldedConfig':

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Make a certificate/private key pair using a locally generated
+# root certificate.
+
+SCRIPT_PATH="/usr/share/veles/easy-rsa"
+
+# For compatibility use common dir for all the versions
+if [ ! -d "${SCRIPT_PATH}/keys" ]; then
+	mkdir "${SCRIPT_PATH}/keys"
+fi
+
+# Just clean the old certificate
+rm "${SCRIPT_PATH}/pki/issued/$1.crt" 2> /dev/null
+rm "${SCRIPT_PATH}/pki/private/$1.key" 2> /dev/null
+rm "${SCRIPT_PATH}/pki/reqs/$1.req" 2> /dev/null
+
+# Call the specific version of easyrsa
+if [ -f "${SCRIPT_PATH}/easyrsa" ]; then	# Easyrsa 3.x
+	cd "${SCRIPT_PATH}" && ./easyrsa build-server-full $* nopass
+	cp -a "${SCRIPT_PATH}/pki/issued/$1.crt" "${SCRIPT_PATH}/keys"
+	cp -a "${SCRIPT_PATH}/pki/private/$1.key" "${SCRIPT_PATH}/keys"
+else						# Easyrsa 2.x
+	cd "${SCRIPT_PATH}" && source ./vars && "${SCRIPT_PATH}/pkitool" --server $*
+fi
+
