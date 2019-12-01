@@ -19,6 +19,8 @@ class VelesMNWebServer(object):
 			port=int(self.config('port', '21345', 'redis_db')),
 			db=self.config('db', '0', 'redis_db')
 		)
+		# Add own Masternode IP to the header, for use with proxies etc.
+		self.headers_common.update({"X-Veles-Masternode-IP": self.config('server_addr')})
 
 	def config(self, key, default = None, section = 'http_server'):
 		try:
