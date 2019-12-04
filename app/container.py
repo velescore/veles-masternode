@@ -4,7 +4,7 @@ import main, appconfig, logging
 from dependency_injector import containers, providers
 from masternode.blockchain import core_node
 from masternode import mnsync
-from persistence.repository import mem
+from persistence.repository import redis
 from jobs import discovery
 
 
@@ -21,16 +21,14 @@ class IocContainer(containers.DeclarativeContainer):
     )
 
     # Gateways, repos
-    #redis_gateway = providers.Singleton(
-    #    redis.RedisGateway,
-    #    host=config('host', '127.0.0.1', 'redis_db'),
-    #    port=config('port', '21345', 'redis_db'),
-    #    db=config('db', '0', 'redis_db'),
-    #)
+    redis_gateway = providers.Singleton(
+        redis.RedisGateway,
+        config=app_config
+    )
     repos = {
         'MasternodeRepository': providers.Singleton(
-            mem.MasternodeRepository,
-            #redis_gateway=redis_gateway
+            redis.MasternodeRepository,
+            redis_gateway=redis_gateway
         )
     }
 

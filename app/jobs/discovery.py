@@ -31,43 +31,41 @@ class ServiceDiscovery(object):
 			yield from asyncio.sleep(int(self.config['discovery'].get('discovery_delay', 300)))
 			self.logger.debug(pref + 'Starting full masternode service discovery ...')
 
-			#try:
-			self.do_service_discovery()
-			#except KeyboardInterrupt:
-			#	self.logger.debug("Shutting down on keyboard interrupt\n")
-			#	return
-			#except:
-			#	self.logger.error(pref + 'An error has occured, starting again ...')
-			#	continue
+			try:
+				self.do_service_discovery()
+
+			except Exception as e:
+				self.logger.error(pref + 'Error: [task will restart]: ' + str(e))
+				continue
 
 	def do_service_discovery(self):
 		mn_list = self.mnsync_service.get_core_masternode_list('full')
+		pref = "ServiceDiscovery::do_service_discovery"
 
 		if not mn_list:
-			self.logger.error("ServiceDiscovery::do_service_discovery: Failed to fetch masternode list from core node")
+			self.logger.error(pref + "Error: Failed to fetch masternode list from core node")
 
 		for ip, mn in mn_list.items():
-			service_status, service_latency = self.query_service_status('80.211.5.147')
+			self.logger.debug(pref + ': query ' + mn.ip)
+			service_status, service_latency = self.query_service_status(ip)
 
 			if service_status and 'services' in service_status:
 				mn.update_service_info({
 					'services': list(service_status['services'].keys()),
 					'service_status': 'ENABLED',
 					'latency_ms': service_latency
+				})
+				if 'blockchain' in service_status and 'api_version' in service_status['blockchain']:
+					mn.update_version_info({
+						'api_version': service_status['blockchain']['api_version'],
+						'core_version': service_status['blockchain']['core_version']
 					})
 			else:
 				mn.update_service_info({
 					'services': [],
 					'service_status': 'INACTIVE',
 					'latency_ms': service_latency
-					})
-				continue
-
-			if 'blockchain' in service_status and 'api_version' in service_status['blockchain']:
-				mn.update_version_info({
-					'api_version': service_status['blockchain']['api_version'],
-					'core_version': service_status['blockchain']['core_version']
-					})
+				})
 
 			self.mnsync_service.update_masternode_list(mn)
 
@@ -83,13 +81,9 @@ class ServiceDiscovery(object):
 
 			result = response.json()['result']
 
-		except KeyboardInterrupt:
-			print("Shutting down on keyboard interrupt")
-			return
-
 		except Exception as e:
 			self.logger.error('ServiceDiscovery::query_service_status: Error: ' + str(e))
-			return False
+			result = False
 
 		request_end = time.time()
 
