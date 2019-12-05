@@ -2,14 +2,15 @@
 
 import main, appconfig, logging
 from dependency_injector import containers, providers
-from masternode.blockchain import core_node
-from masternode import mnsync
-from persistence.repository import redis
-from jobs import discovery
+from blockchain import core_node
+from masternode import mnsync, signing
+from jobs import discovery, webserver
+from controllers import status
 
 
 class IocContainer(containers.DeclarativeContainer):
     """Application IoC container."""
+    db_type = 'mem'
     config = providers.Configuration('config')
     logger = providers.Singleton(logging.Logger, name='VelesMasternode')
 
@@ -21,16 +22,27 @@ class IocContainer(containers.DeclarativeContainer):
     )
 
     # Gateways, repos
-    redis_gateway = providers.Singleton(
-        redis.RedisGateway,
-        config=app_config
-    )
-    repos = {
-        'MasternodeRepository': providers.Singleton(
-            redis.MasternodeRepository,
-            redis_gateway=redis_gateway
+    if db_type == 'redis':
+        from persistence.repository import redis
+
+        redis_gateway = providers.Singleton(
+            redis.RedisGateway,
+            config=app_config
         )
-    }
+        repos = {
+            'MasternodeRepository': providers.Singleton(
+                redis.MasternodeRepository,
+                redis_gateway=redis_gateway
+            )
+        }
+    else:
+        from persistence.repository import mem
+
+        repos = {
+            'MasternodeRepository': providers.Singleton(
+                mem.MasternodeRepository
+            )
+        } 
 
     # Services
     services = {
@@ -40,21 +52,49 @@ class IocContainer(containers.DeclarativeContainer):
             logger=logger
         )
     }
-    services['MasternodeSyncService'] = providers.Factory(
-        mnsync.MasternodeSyncService,
-        masternode_repo=repos['MasternodeRepository'],
-        core_node_service=services['CoreNodeService'],
-        logger=logger
-    )
+    services.update({
+        'MasternodeSyncService': providers.Factory(
+            mnsync.MasternodeSyncService,
+            masternode_repo=repos['MasternodeRepository'],
+            core_node_service=services['CoreNodeService'],
+            logger=logger
+        )
+    })
+    services.update({
+        'MasternodeSigningService': providers.Factory(
+            signing.MasternodeSigningService,
+            core_node_service=services['CoreNodeService'],
+            mnsync_service=services['MasternodeSyncService'],
+            config=app_config,
+            logger=logger
+        )
+    })
+
+    # Controllers
+    controllers = {
+        'StatusController': providers.Factory(
+            status.StatusController,
+            config=app_config,
+            logger=logger,
+            signing_service=services['MasternodeSigningService'],
+            core_node=services['CoreNodeService']
+        )
+    }
 
     # Jobs
     jobs = {
         'ServiceDiscovery': providers.Factory(
             discovery.ServiceDiscovery,
             mnsync_service=services['MasternodeSyncService'],
-            logger=logger,
-            config=app_config
-        )
+            config=app_config,
+            logger=logger
+        ),
+        'WebServer': providers.Factory(
+            webserver.WebServer,
+            controllers=controllers,
+            config=app_config,
+            logger=logger
+        ),
     }
 
     # Main
@@ -62,3 +102,4 @@ class IocContainer(containers.DeclarativeContainer):
         main.run_job,
         jobs,
     )
+

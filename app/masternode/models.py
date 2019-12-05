@@ -5,10 +5,6 @@ import copy
 
 class Masternode(BaseFillableObject):
 	""" Represents a last known state of a masternode """
-	def __init__(self, attributes):
-		self.fill(attributes)
-
-	""" Represents a masternode """
 	_required = ['ip', 'outpoint', 'payee']		# Required attributes
 	service_status = 'UNKNOWN'
 	core_info = {}

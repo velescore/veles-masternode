@@ -25,7 +25,7 @@ class MasternodeSyncService(object):
 	def get_core_masternode_list(self, mode = None):
 		""" Returns masternode list """
 		try:
-			raw_list = self.core_node.command('masternodelist', [mode])
+			raw_list = self.core_node.call('masternodelist', [mode])
 		except:
 			self.logger.warning('MasternodeSyncService::get_masternode_list(): failed to obtain masternode list "%s" from core_node' % mode)
 			return False

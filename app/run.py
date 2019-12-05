@@ -5,7 +5,6 @@
 import sys, logging, argparse
 
 from container import IocContainer
-from masternode.blockchain import core_node
 
 class VelesMasternodeCLI(object):
 	_container = None

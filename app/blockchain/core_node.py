@@ -16,7 +16,7 @@ class CoreNodeService(object):
 		self.config = config
 		self.logger = logger
 
-	def command(self, command, args = []):
+	def call(self, command, args = []):
 		"""For debugging porposes"""
 		return self.core_node.call(command, args)
 		
