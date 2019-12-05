@@ -19,7 +19,6 @@ class ServiceDiscovery(object):
 			self.service_discovery_task()
 			))
 		loop.run_forever()
-		self.do_service_discovery()
 
 	@asyncio.coroutine
 	def service_discovery_task(self):
