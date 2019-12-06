@@ -14,18 +14,15 @@ class dAppRegistry(object):
 		if dapp_provider.name() in self.dapp_facades:
 			self.logger.warning('dAppRegistry::register_dapp: dApp %s is already registered' % dapp_provider.name())
 
-		self.dapp_facades[dapp_provider.name()] = dapp_provider.make_facade(container)
-		self.logger.debug('dAppRegistry::register_dapp: Registered dApp %s' % dapp_provider.name())
+		self.logger.debug('dAppRegistry::register_dapp: Registering dApp %s' % dapp_provider.name())
+		self.dapp_facades[dapp_provider.name()] = dapp_provider.make_facade()
 
 	def load_dapps(self, container):
-		providers = {}
+		modules = {}
 
 		for dapp_name in self.config['dapps'].get('enabled').split(','):
-			dapp_name = dapp_name.strip()
-
-			providers[dapp_name] = importlib.import_module("dapps.vpn.provider")
-			dapp_provider = providers[dapp_name].dAppProvider()
-			self.dapp_facades[dapp_name] = dapp_provider.make_facade(container)
+			modules[dapp_name.strip()] = importlib.import_module("dapps.vpn.provider")
+			self.register_dapp(modules[dapp_name.strip()].dAppProvider(container))
 
 	def get_all(self):
 		return self.dapp_facades

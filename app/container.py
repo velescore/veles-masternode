@@ -47,14 +47,14 @@ class IocContainer(containers.DeclarativeContainer):
 
     # Services
     services = {
-        'CoreNodeService': providers.Factory(
+        'CoreNodeService': providers.Singleton(
             core_node.CoreNodeService,
             config=app_config,
             logger=logger
         )
     }
     services.update({
-        'MasternodeSyncService': providers.Factory(
+        'MasternodeSyncService': providers.Singleton(
             mnsync.MasternodeSyncService,
             masternode_repo=repos['MasternodeRepository'],
             core_node_service=services['CoreNodeService'],
@@ -62,7 +62,7 @@ class IocContainer(containers.DeclarativeContainer):
         )
     })
     services.update({
-        'MasternodeSigningService': providers.Factory(
+        'MasternodeSigningService': providers.Singleton(
             signing.MasternodeSigningService,
             core_node_service=services['CoreNodeService'],
             mnsync_service=services['MasternodeSyncService'],
@@ -106,9 +106,10 @@ class IocContainer(containers.DeclarativeContainer):
         ),
     }
 
-    # Main
-    run_job = providers.Callable(
-        main.run_job,
-        jobs,
-    )
+    # Main app entry point
+    app = providers.Singleton(
+        main.MainAppEntryPoint,
+        logger=logger,
+        jobs=jobs
+        )
 

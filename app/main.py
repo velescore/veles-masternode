@@ -1,14 +1,34 @@
-""" Main methods that get called by CLI. This is (hopefully)
-    the only non-OOP Python file in the project """
+""" Main app entry point """
 
-def run_job(jobs, job_name):
-	if job_name in jobs:
-		try:
-			return jobs[job_name]().start_job()
-		except KeyboardInterrupt:
-			print("\nVelesMasternodeCLI: Shutting down on keyboard interrupt\n")
-			return
-		except:
-			raise ValueError("Failed to run job: %s" % job_name)
-	raise ValueError("Failed to find job: %s" % job_name)
+import logging, sys
+
+class MainAppEntryPoint(object):
+	""" Minimalistic app entry point """
+
+	def __init__(self, logger, jobs):
+		self.logger = logger
+		self.jobs = jobs
+
+		# Set-up global logging
+		logger.addHandler(logging.StreamHandler(sys.stdout))
+
+	def init_dapps(self, container):
+		container.dapp_registry().load_dapps(container)
+
+	def run_job(self, job_name):
+		""" Runs a job from jobs directory """
+		if job_name in self.jobs:
+			try:
+				self.jobs[job_name]().start_job()
+				return
+
+			except KeyboardInterrupt:
+				self.logger.info("\nVelesMasternodeApp: Shutting down on keyboard interrupt\n")
+				return
+
+			except:
+				self.logger.error("Veles Masternode: Failed to run job: %s" % job_name)
+		self.logger.error("Veles Masternode: No such job found: %s" % job_name)
+
+
 
