@@ -1,13 +1,12 @@
 from openvpn_api import vpn
 from hashlib import blake2b
-from dapps.vpn import gateway
 
 class VPNManagementGateway(object):
 	salt = ''
 
 	def __init__(self, config, logger):
-		self.host = config['dapp.vpn'].get('host', '127.0.0.1')
-		self.port = config['dapp.vpn'].get('port', '21432')
+		self.host = config['dapps.vpn'].get('host', '127.0.0.1')
+		self.port = config['dapps.vpn'].get('port', '21432')
 		self.config = config
 		self.logger = logger
 		self.openvpn = None
@@ -21,7 +20,7 @@ class VPNManagementGateway(object):
 		result = {
 			'client_list': [],
 			'up_since': str(state.up_since),
-			'state_name': state.state_name,
+			'server_state': state.state_name,
 			'client_count': len(status.client_list),
 			'server_options': rel[rel.find('['):rel.rfind(']')+1],
 			'server_version': self.server().version

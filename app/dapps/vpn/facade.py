@@ -6,7 +6,7 @@ class VPNdAppFacade(object):
 	def __init__(self, config, logger, status_service):
 		self.config = config
 		self.logger = logger
-		self.logger.debug('VPNdAppFacade: dVPN dApp loaded')
+		self.logger.debug('VPNdAppFacade: dApp VPN loaded')
 		self.status_service = status_service
 
 	def service_status(self):
