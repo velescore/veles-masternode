@@ -35,6 +35,7 @@ class VelesMasternodeCLI(object):
 			config=self._args	# Container's initial parameters, configuration to load real config
 		)
 		self._container.logger().addHandler(logging.StreamHandler(sys.stdout))
+		self._container.dapp_registry().load_dapps(self._container)
 
 if __name__ == '__main__':
 	app = VelesMasternodeCLI()

@@ -3,9 +3,10 @@ import asyncio, sys, json, version
 from controllers.base import BaseController
 
 class StatusController(BaseController):
-	def __init__(self, config, logger, signing_service, core_node):
+	def __init__(self, config, logger, signing_service, core_node, dapp_registry):
 		super().__init__(config, logger, signing_service)
 		self.core = core_node
+		self.dapps = dapp_registry.get_all()
 
 	@asyncio.coroutine
 	def handle(self, request):
@@ -34,6 +35,7 @@ class StatusController(BaseController):
 			'api_version': version.api_version,		
 		}
 		
+		# MN status
 		try:
 			mn_status = self.core.call('masternode', ['status'])
 		except Exception as e:
@@ -52,8 +54,14 @@ class StatusController(BaseController):
 		except:
 			mn_status['state_name'] = 'UNKNOWN'
 
+		# Dapps status
+		service_status = {}
+		for dapp_name, dapp_facade in self.dapps.items():
+			service_status[dapp_name] = dapp_facade.service_status()
+
 		return self.response({
 			'blockchain': core_status,
+			'services': service_status,
 			'masternode': mn_status,
 			'version': version_status
 			})

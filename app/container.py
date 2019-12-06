@@ -6,6 +6,7 @@ from blockchain import core_node
 from masternode import mnsync, signing
 from jobs import discovery, webserver
 from controllers import status
+from dapps import registry
 
 
 class IocContainer(containers.DeclarativeContainer):
@@ -70,6 +71,13 @@ class IocContainer(containers.DeclarativeContainer):
         )
     })
 
+    # Dapps
+    dapp_registry = providers.Factory(
+        registry.dAppRegistry,
+        config=app_config,
+        logger=logger
+    )
+
     # Controllers
     controllers = {
         'StatusController': providers.Factory(
@@ -77,7 +85,8 @@ class IocContainer(containers.DeclarativeContainer):
             config=app_config,
             logger=logger,
             signing_service=services['MasternodeSigningService'],
-            core_node=services['CoreNodeService']
+            core_node=services['CoreNodeService'],
+            dapp_registry=dapp_registry
         )
     }
 
