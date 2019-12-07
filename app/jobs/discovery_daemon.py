@@ -2,9 +2,9 @@
 
 import requests, json, time, asyncio
 
-class ServiceDiscovery(object):
+class DiscoveryDaemon(object):
 	"""Service to manage extended masternode sync"""
-	headers = {"Server": "VelesMNWebSync"}
+	headers = {"Server": "Veles Core Masternode (DiscoveryDaemon)"}
 
 	def __init__(self, mnsync_service, logger, config):
 		"""Constructor"""
@@ -22,7 +22,7 @@ class ServiceDiscovery(object):
 
 	@asyncio.coroutine
 	def service_discovery_task(self):
-		pref = 'ServiceDiscovery::service_discovery_task: '
+		pref = 'DiscoveryDaemon::service_discovery_task: '
 		self.logger.info(pref + 'Starting asynchronous service_discovery_task')
 
 		while True:
@@ -39,36 +39,36 @@ class ServiceDiscovery(object):
 
 	def do_service_discovery(self):
 		mn_list = self.mnsync_service.get_core_masternode_list('full')
-		pref = "ServiceDiscovery::do_service_discovery"
+		pref = "DiscoveryDaemon::do_service_discovery"
 
 		if not mn_list:
 			self.logger.error(pref + "Error: Failed to fetch masternode list from core node")
 
 		for ip, mn in mn_list.items():
 			self.logger.debug(pref + ': query ' + mn.ip)
-			service_status, service_latency = self.query_service_status(ip)
+			dapp_status, service_latency = self.query_dapp_status(ip)
 
-			if service_status and 'services' in service_status:
+			if dapp_status and 'services' in dapp_status:
 				mn.update_service_info({
-					'services': list(service_status['services'].keys()),
-					'service_status': 'ENABLED',
+					'services': list(dapp_status['services'].keys()),
+					'dapp_status': 'ENABLED',
 					'latency_ms': service_latency
 				})
-				if 'blockchain' in service_status and 'api_version' in service_status['blockchain']:
+				if 'blockchain' in dapp_status and 'api_version' in dapp_status['blockchain']:
 					mn.update_version_info({
-						'api_version': service_status['blockchain']['api_version'],
-						'core_version': service_status['blockchain']['core_version']
+						'api_version': dapp_status['blockchain']['api_version'],
+						'core_version': dapp_status['blockchain']['core_version']
 					})
 			else:
 				mn.update_service_info({
 					'services': [],
-					'service_status': 'INACTIVE',
+					'dapp_status': 'INACTIVE',
 					'latency_ms': service_latency
 				})
 
 			self.mnsync_service.update_masternode_list(mn)
 
-	def query_service_status(self, node_ip, method = 'status', api_dir = 'api'):
+	def query_dapp_status(self, node_ip, method = 'status', api_dir = 'api'):
 		url = 'https://%s/%s/%s' % (node_ip, api_dir, method)
 		request_start = time.time()
 
@@ -81,7 +81,7 @@ class ServiceDiscovery(object):
 			result = response.json()['result']
 
 		except Exception as e:
-			self.logger.error('ServiceDiscovery::query_service_status: Error: ' + str(e))
+			self.logger.error('DiscoveryDaemon::query_dapp_status: Error: ' + str(e))
 			result = False
 
 		request_end = time.time()

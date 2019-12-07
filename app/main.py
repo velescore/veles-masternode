@@ -17,17 +17,18 @@ class MainAppEntryPoint(object):
 
 	def run_job(self, job_name):
 		""" Runs a job from jobs directory """
-		if job_name in self.jobs:
-			try:
-				self.jobs[job_name]().start_job()
-				return
+		if job_name in self.jobs.keys():
+			#try:
+			self.jobs[job_name]().start_job()
+			#	return
 
-			except KeyboardInterrupt:
-				self.logger.info("\nVelesMasternodeApp: Shutting down on keyboard interrupt\n")
-				return
+			#except KeyboardInterrupt:
+			#	self.logger.info("\nVelesMasternodeApp: Shutting down on keyboard interrupt\n")
+			#	return
 
-			except:
-				self.logger.error("Veles Masternode: Failed to run job: %s" % job_name)
+			#except:
+			#	self.logger.error("Veles Masternode: Failed to run job: %s" % job_name)
+			#	return
 		self.logger.error("Veles Masternode: No such job found: %s" % job_name)
 
 

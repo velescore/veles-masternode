@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
+from dapps.interfaces import AbstractProvider
 from dapps.vpn import facade
-from dapps.vpn import status
+from dapps.vpn import status_service
+from dapps.vpn import metric_service
 
-class dAppProvider(object):
+class dAppProvider(AbstractProvider):
 	dapp_name = 'VPN'
 	dependencies = {}
 	db_type = 'mem'
@@ -25,19 +27,6 @@ class dAppProvider(object):
 		return None
 
 	def make_facade(self):
-		# Lazy load only when needed first time
-		if self.db_type == 'redis':
-			from persistence.repsitory import redis
-
-			self.register('StatsRepository', redis.StatsRepository(
-					redis_gateway=self.container.redis_gateway(),
-					prefix='dapp.vpn'
-					))
-		else:
-			from persistence.repository import mem
-
-			self.register('StatsRepository', mem.StatsRepository())
-
 		if self.gw_type == 'dummy':
 			from dapps.vpn import dummy
 
@@ -50,12 +39,16 @@ class dAppProvider(object):
 					logger=self.container.logger(),
 					))
 
-
-		self.register('VPNStatusService', status.VPNStatusService(
+		self.register('VPNMetricService', metric_service.VPNMetricService(
+				config=self.container.app_config(), 
+				logger=self.container.logger(),
+				metric_repository=self.container.metric_repository(),
+				))
+		self.register('VPNStatusService', status_service.VPNStatusService(
 				config=self.container.app_config(), 
 				logger=self.container.logger(),
 				vpn_gateway=self.singleton('VPNManagementGateway'),
-				stats_repo=self.singleton('StatsRepository'),
+				metric_service=self.singleton('VPNManagementGateway'),
 				))
 
 		# Return main dApp facade that will act as API between other
@@ -63,5 +56,6 @@ class dAppProvider(object):
 		return facade.VPNdAppFacade(
 			config=self.container.app_config(), 
 			logger=self.container.logger(),
-			status_service=self.singleton('VPNStatusService')
+			status_service=self.singleton('VPNStatusService'),
+			metric_service=self.singleton('VPNMetricService')
 			)
