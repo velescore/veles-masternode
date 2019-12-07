@@ -6,7 +6,7 @@ import copy
 class Masternode(BaseFillableObject):
 	""" Represents a last known state of a masternode """
 	_required = ['ip', 'outpoint', 'payee']		# Required attributes
-	service_status = 'UNKNOWN'
+	dapp_status = 'UNKNOWN'
 	core_info = {}
 	service_info = {}
 	version_info = {}

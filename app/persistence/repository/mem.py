@@ -26,15 +26,18 @@ class MasternodeRepository(object):
 		self.data.pop(key)
 
 
-class StatsRepository(object):
-	""" Does CRUD operation with Stats object on dummy database """
+class MetricRepository(object):
+	""" Does CRUD operation with Masternode object on dummy database """
 	data = {}
+	debug = False
 
 	def store(self, key, value):
-		self.data[model.ip] = model
+		self.data[key] = value
+		if self.debug: print('store|', key, '|', value, '|')
 
 	def get(self, key):
 		if key in self.data:
+			if self.debug: print('get|', key, '|', self.data[key], '|')
 			return self.data[key]
 
 		return None

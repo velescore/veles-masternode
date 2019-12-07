@@ -55,13 +55,13 @@ class StatusController(BaseController):
 			mn_status['state_name'] = 'UNKNOWN'
 
 		# Dapps status
-		service_status = {}
+		dapp_status = {}
 		for dapp_name, dapp_facade in self.dapps.items():
-			service_status[dapp_name] = dapp_facade.service_status()
+			dapp_status[dapp_name] = dapp_facade.dapp_status()
 
 		return self.response({
 			'blockchain': core_status,
-			'services': service_status,
+			'services': dapp_status,
 			'masternode': mn_status,
 			'version': version_status
 			})

@@ -27,7 +27,7 @@ class MasternodeRepository(object):
 
 	def get(self, ip):
 		if self.exists(ip):
-			return self.unserialize(self.gw.client.get('mnlist:entry:' + ip).decode('utf-8'))
+			return self_unserialize(self.gw.client.get('mnlist:entry:' + ip).decode('utf-8'))
 		return None
 
 	def get_all(self):
@@ -44,11 +44,11 @@ class MasternodeRepository(object):
 		cursor, keys = self.gw.client.scan(match='mnlist:entry:*')
 		return keys
 
-	def exists(self, key):
-		return key in self.data
+	def exists(self, ip):
+		return ('mnlist:entry:' + ip) in self.data
 
-	def delete(self, key):
-		self.data.pop(key)
+	def delete(self, ip):
+		self.data.pop('mnlist:entry:' + ip)
 
 	def _serialize(self, obj):
 		return pickle.dumps(obj)
@@ -58,20 +58,19 @@ class MasternodeRepository(object):
 
 
 
-class StatsRepository(object):
-	""" Does CRUD operation with Masternode object on Redis database """
+class MetricRepository(object):
+	""" Does CRUD operation with Metric object on Redis database """
 
-	def __init__(self, redis_gateway, prefix='mn'):
+	def __init__(self, redis_gateway):
 		"""Constructor"""
 		self.gw = redis_gateway
-		self.prefix = 'stats:' + prefix
 
-	def store(self, mn):
-		self.gw.client.set(self.prefix + ':entry:' + mn.ip, self._serialize(mn))
+	def store(self, key, value):
+		self.gw.client.set('metric:entry:' + key, self._serialize(value))
 
-	def get(self, ip):
-		if self.exists(ip):
-			return self.unserialize(self.gw.client.get(self.prefix + ':entry:' + ip).decode('utf-8'))
+	def get(self, key):
+		if self.exists(key):
+			return self_unserialize(self.gw.client.get('metric:entry:' + key).decode('utf-8'))
 		return None
 
 	def get_all(self):
@@ -85,7 +84,7 @@ class StatsRepository(object):
 		return result
 
 	def get_keys(self):
-		cursor, keys = self.gw.client.scan(match=self.prefix + ':entry:*')
+		cursor, keys = self.gw.client.scan(match='metric:entry:*')
 		return keys
 
 	def exists(self, key):

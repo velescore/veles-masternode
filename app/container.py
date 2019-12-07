@@ -4,7 +4,7 @@ import main, appconfig, logging
 from dependency_injector import containers, providers
 from blockchain import core_node
 from masternode import mnsync, signing
-from jobs import discovery, webserver
+from jobs import discovery_daemon, metric_daemon, web_server
 from controllers import status
 from dapps import registry
 
@@ -34,6 +34,10 @@ class IocContainer(containers.DeclarativeContainer):
             'MasternodeRepository': providers.Singleton(
                 redis.MasternodeRepository,
                 redis_gateway=redis_gateway
+            ),
+            'MetricRepository': providers.Singleton(
+                redis.MetricRepository,
+                redis_gateway=redis_gateway
             )
         }
     else:
@@ -42,6 +46,9 @@ class IocContainer(containers.DeclarativeContainer):
         repos = {
             'MasternodeRepository': providers.Singleton(
                 mem.MasternodeRepository
+            ),
+            'MetricRepository': providers.Singleton(
+                mem.MetricRepository
             )
         } 
 
@@ -71,6 +78,9 @@ class IocContainer(containers.DeclarativeContainer):
         )
     })
 
+    # Repos/Services accessible for other provider classes
+    metric_repository = repos['MetricRepository']
+     
     # Dapps
     dapp_registry = providers.Factory(
         registry.dAppRegistry,
@@ -92,14 +102,21 @@ class IocContainer(containers.DeclarativeContainer):
 
     # Jobs
     jobs = {
-        'ServiceDiscovery': providers.Factory(
-            discovery.ServiceDiscovery,
+        'DiscoveryDaemon': providers.Factory(
+            discovery_daemon.DiscoveryDaemon,
             mnsync_service=services['MasternodeSyncService'],
             config=app_config,
             logger=logger
         ),
+        'MetricDaemon': providers.Factory(
+            metric_daemon.MetricDaemon,
+            metric_repository=repos['MetricRepository'],
+            dapp_registry=dapp_registry,
+            config=app_config,
+            logger=logger
+        ),
         'WebServer': providers.Factory(
-            webserver.WebServer,
+            web_server.WebServer,
             controllers=controllers,
             config=app_config,
             logger=logger
