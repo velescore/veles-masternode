@@ -1,6 +1,6 @@
 """ Veles Masternode (gen 2) sync service """
 
-from masternode.models import Masternode
+from masternode.masternode import MasternodeInfo
 
 class MasternodeSyncService(object):
 	"""Service to manage extended masternode sync"""
@@ -78,7 +78,7 @@ class MasternodeSyncService(object):
 			if dictionary or mode != 'full':
 				result[entry[key]] = entry
 			else:
-				result[entry[key]] = Masternode({
+				result[entry[key]] = MasternodeInfo({
 					'ip': entry['ip'],
 					'outpoint': entry['outpoint'],
 					'payee': entry['payee'],

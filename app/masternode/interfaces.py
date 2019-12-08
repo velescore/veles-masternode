@@ -1,6 +1,7 @@
 """ Veles Masternode (gen 2) masternode module base classes """
+from abc import ABCMeta, abstractmethod
 
-class BaseFillableObject(object):
+class AbstractFillableObject(object, metaclass=ABCMeta):
 	_required = []
 
 	def __init__(self, attributes):
@@ -19,4 +20,12 @@ class BaseFillableObject(object):
 				setattr(self, name, value)
 
 	def attributes(self):
-		return self.__dict__
+		attributes = {}
+
+		# Skip 'private' properties
+		for attr_name, attr_value in self.__dict__.items():
+			if attr_name[0] != '_':
+				attributes[attr_name] = attr_value
+
+		return attributes
+

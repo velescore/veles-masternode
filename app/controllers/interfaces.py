@@ -1,17 +1,23 @@
 #!/usr/bin/env python
 import asyncio, sys, json, time
 from aiohttp import web
-import version
+from abc import ABCMeta, abstractmethod
+import version 		# local modules
 
-class BaseController(object):
+class AbstractController(object, metaclass=ABCMeta):
 	headers_common = {"Server": "lighttpd/1.4.45"}
 	headers_json = {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"}
 	headers_html = {"Content-Type": "text/html"}
 
-	def __init__(self, config, logger, signing_service):
+	@abstractmethod
+	@asyncio.coroutine
+	def handle(self, request):
+		""" Accepts web.Request and should return web.Response object """
+		pass
+
+	def __init__(self, config, logger):
 		self.config = config
 		self.logger = logger
-		self.signing_service = signing_service
 		self.init_headers()
 
 	def init_headers(self):
@@ -42,15 +48,27 @@ class BaseController(object):
 		text = json.dumps(data, sort_keys = True, indent = 4)
 		return web.Response(text=text, headers=self.add_json_headers(extra_headers, text))
 
-	def add_html_headers(self, extra_headers, text=None):
-		if text:
-			return self.add_signature_headers({**self.headers_common, **self.headers_html, **extra_headers}, text)
+	def add_html_headers(self, extra_headers, body=None):
+		return {**self.headers_common, **self.headers_html, **extra_headers}
+
+	def add_json_headers(self, extra_headers, body=None):
+		return {**self.headers_common, **self.headers_json, **extra_headers}
+
+
+class AbstractSigningController(AbstractController, metaclass=ABCMeta):
+	def __init__(self, config, logger, signing_service):
+		self.signing_service = signing_service
+		super().__init__(config, logger)
+
+	def add_html_headers(self, extra_headers, body=None):
+		if body:
+			return self.add_signature_headers({**self.headers_common, **self.headers_html, **extra_headers}, body)
 		else:
 			return {**self.headers_common, **self.headers_html, **extra_headers}
 
-	def add_json_headers(self, extra_headers, text=None):
-		if text:
-			return self.add_signature_headers({**self.headers_common, **self.headers_json, **extra_headers}, text, cb='json')
+	def add_json_headers(self, extra_headers, body=None):
+		if body:
+			return self.add_signature_headers({**self.headers_common, **self.headers_json, **extra_headers}, body, cb='json')
 		else:
 			return {**self.headers_common, **self.headers_json, **extra_headers}
 
@@ -92,9 +110,3 @@ class BaseController(object):
 				self.signing_service.sign(body)
 				) + err
 		}
-
-	@asyncio.coroutine
-	def handle(self, request):
-		err = "BaseController::handle: Missing handle method in child class"
-		self.logger(err)
-		return self.response(err, success=False)

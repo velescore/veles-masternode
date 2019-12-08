@@ -6,8 +6,8 @@ class MetricDaemon(object):
 	"""Service to manage extended masternode sync"""
 	headers = {"Server": "Veles Core Masternode (MetricDaemon)"}
 	intervals = {
-		'hourly': 3.600,
-		'daily': 3.600*24
+		'hourly': 3600,
+		'daily': 3600*24
 	}
 
 	def __init__(self, config, logger, metric_repository, dapp_registry):
@@ -31,7 +31,7 @@ class MetricDaemon(object):
 		pref = 'MetricDaemon::recent_metrics_update_task [%s]: ' % interval_name
 		interval = self.intervals[interval_name]
 		self.logger.info(pref + 'Starting new asynchronous task')
-		next_sleep_seconds = interval
+		next_sleep_seconds = 10 	# first sleep is not important
 
 		while True:
 			self.logger.debug(pref + '[ sleeping for %i s / running %s ]' % (next_sleep_seconds, interval_name))
@@ -60,4 +60,3 @@ class MetricDaemon(object):
 		for dapp_name, dapp_facade in self.dapps.items():
 			self.logger.debug('MetricDaemon::update_recent_metrics: Updating %s metrics of dApp %s' % (interval_name, dapp_name))
 			dapp_facade.get_metric_service().update_recent_metrics(interval_name)
-			dapp_facade.get_metric_service().get_recent_metrics(interval_name)

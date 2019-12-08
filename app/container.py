@@ -2,10 +2,10 @@
 
 import main, appconfig, logging
 from dependency_injector import containers, providers
-from blockchain import core_node
-from masternode import mnsync, signing
+from blockchain import core_node_service
+from masternode import mnsync_service, signing_service
 from jobs import discovery_daemon, metric_daemon, web_server
-from controllers import status
+from controllers import masternode_status
 from dapps import registry
 
 
@@ -55,14 +55,14 @@ class IocContainer(containers.DeclarativeContainer):
     # Services
     services = {
         'CoreNodeService': providers.Singleton(
-            core_node.CoreNodeService,
+            core_node_service.CoreNodeService,
             config=app_config,
             logger=logger
         )
     }
     services.update({
         'MasternodeSyncService': providers.Singleton(
-            mnsync.MasternodeSyncService,
+            mnsync_service.MasternodeSyncService,
             masternode_repo=repos['MasternodeRepository'],
             core_node_service=services['CoreNodeService'],
             logger=logger
@@ -70,7 +70,7 @@ class IocContainer(containers.DeclarativeContainer):
     })
     services.update({
         'MasternodeSigningService': providers.Singleton(
-            signing.MasternodeSigningService,
+            signing_service.MasternodeSigningService,
             core_node_service=services['CoreNodeService'],
             mnsync_service=services['MasternodeSyncService'],
             config=app_config,
@@ -91,7 +91,7 @@ class IocContainer(containers.DeclarativeContainer):
     # Controllers
     controllers = {
         'StatusController': providers.Factory(
-            status.StatusController,
+            masternode_status.MasternodeStatusController,
             config=app_config,
             logger=logger,
             signing_service=services['MasternodeSigningService'],
