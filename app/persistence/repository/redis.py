@@ -27,7 +27,7 @@ class MasternodeRepository(object):
 
 	def get(self, ip):
 		if self.exists(ip):
-			return self_unserialize(self.gw.client.get('mnlist:entry:' + ip).decode('utf-8'))
+			return self._unserialize(self.gw.client.get('mnlist:entry:' + ip).decode('utf-8'))
 		return None
 
 	def get_all(self):
@@ -70,7 +70,7 @@ class MetricRepository(object):
 
 	def get(self, key):
 		if self.exists(key):
-			return self_unserialize(self.gw.client.get('metric:entry:' + key).decode('utf-8'))
+			return self._unserialize(self.gw.client.get('metric:entry:' + key))	#.decode('utf-8'))
 		return None
 
 	def get_all(self):
@@ -88,7 +88,7 @@ class MetricRepository(object):
 		return keys
 
 	def exists(self, key):
-		return key in self.data
+		return self.gw.client.get('metric:entry:' + key) is not None
 
 	def delete(self, key):
 		self.data.pop(key)

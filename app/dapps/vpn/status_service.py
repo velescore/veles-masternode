@@ -16,13 +16,16 @@ class VPNStatusService(AbstractStatusService):
 		except Exception as e:
 			server_stats = {}
 			state_name = 'INACTIVE'
-			self.logger.error('VPNStatusService::dapp_status: Failed to obtain OpenVPN server status')
+			self.logger.error('VPNStatusService::dapp_status: Failed to obtain OpenVPN server status: ' + str(e))
 
 		try:
-			metrics_stats = self.metric_service.get_current_metrics()
+			metrics_stats = {
+				'daily': self.metric_service.get_recent_metrics('daily'),
+				'hourly': self.metric_service.get_recent_metrics('hourly'),
+			}
 		except Exception as e:
 			metrics_stats = {}
-			metrics_stats = 'INACTIVE'
-			self.logger.error('VPNStatusService::dapp_status: Failed to obtain OpenVPN network device status')
+			state_name = 'INACTIVE'
+			self.logger.error('VPNStatusService::dapp_status: Failed to obtain OpenVPN network device status: ' + str(e))
 
-		return {**server_stats, 'metrics_stats': metrics_stats, 'state_name': state_name}
+		return {**server_stats, 'metrics': metrics_stats, 'state_name': state_name}

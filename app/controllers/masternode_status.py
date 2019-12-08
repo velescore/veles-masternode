@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import asyncio, sys, json, version
-from controllers.base import BaseController
+from controllers.interfaces import AbstractSigningController
 
-class StatusController(BaseController):
+class MasternodeStatusController(AbstractSigningController):
 	def __init__(self, config, logger, signing_service, core_node, dapp_registry):
 		super().__init__(config, logger, signing_service)
 		self.core = core_node
@@ -20,7 +20,6 @@ class StatusController(BaseController):
 		core_status = {
 			'blocks': chain_info['blocks'],
 			'bestblockhash': chain_info['bestblockhash'],
-			'difficulty': chain_info['difficulty'],
 			'timeoffset': net_info['timeoffset'],
 			'connections': net_info['connections'],
 			'relayfee': net_info['connections'],
@@ -57,7 +56,7 @@ class StatusController(BaseController):
 		# Dapps status
 		dapp_status = {}
 		for dapp_name, dapp_facade in self.dapps.items():
-			dapp_status[dapp_name] = dapp_facade.dapp_status()
+			dapp_status[dapp_name] = dapp_facade.get_status_service().get_dapp_status()
 
 		return self.response({
 			'blockchain': core_status,

@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 class VPNMetricService(AbstractMetricService):
 	data_prefix = 'vpn'
 	intervals = {
-		'hourly': 3.600,
-		'daily': 3.600*24
+		'hourly': 3600,
+		'daily': 3600*24
 	}
 
 	def __init__(self, config, logger, metric_repository):
@@ -16,7 +16,7 @@ class VPNMetricService(AbstractMetricService):
 		self.repo = metric_repository
 
 	def get_recent_metrics(self, interval_name):
-		""" Calculates and updates in database metrics for the last specified time interval """
+		""" Retrieves metrics for the last specified time interval """
 		if not interval_name in self.intervals:
 			self.logger.warning('VPNMetricService::update_recent_metrics: Unsupported interval ' + interval_name)
 			return
@@ -40,11 +40,7 @@ class VPNMetricService(AbstractMetricService):
 			self.logger.info('VPNMetricService::get_recent_metrics: No recent metrics in database for interval ' + interval_name)
 			return {}
 
-		return {
-			**self.repo.get(last_metrics_key), 
-			'interval_since': last_time_since.isoformat(),
-			'interval_until': last_time.isoformat(),
-			}
+		return self.repo.get(last_metrics_key)
 
 
 	def update_recent_metrics(self, interval_name):
@@ -78,7 +74,11 @@ class VPNMetricService(AbstractMetricService):
 			self.logger.debug('VPNMetricService::update_recent_metrics: No previous metric records found for interval ' + interval_name)
 			return
 
-		self.repo.store(prev_metrics_key, self._compare_metrics(prev_metrics_state, cur_metrics_state))
+		self.repo.store(prev_metrics_key, {
+			'interval_since': prev_time.isoformat().split('.')[0],	# remove miliseconds
+			'interval_until': now.isoformat().split('.')[0],
+			**self._compare_metrics(prev_metrics_state, cur_metrics_state)
+			})
 
 	# Private methods
 	def _get_current_metrics(self):

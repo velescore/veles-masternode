@@ -33,8 +33,8 @@ class VPNManagementGateway(object):
 			result['client_list'] += [{
 				'session_id': h1.hexdigest(),
 				'client_id': h2.hexdigest(),
-				'bytes_received': int(client.bytes_received),
-				'bytes_sent': int(client.bytes_sent),
+				'bytes_in': int(client.bytes_received),
+				'bytes_out': int(client.bytes_sent),
 				'connected_since': str(client.connected_since),
 				'payment_status': 'ALPHA_TRIAL'
 				}]

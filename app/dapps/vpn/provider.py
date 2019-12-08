@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 from dapps.interfaces import AbstractProvider
-from dapps.vpn import facade
-from dapps.vpn import status_service
-from dapps.vpn import metric_service
+from dapps.vpn import facade, dummy, status_service, metric_service
 
 class dAppProvider(AbstractProvider):
 	dapp_name = 'VPN'
@@ -48,7 +46,7 @@ class dAppProvider(AbstractProvider):
 				config=self.container.app_config(), 
 				logger=self.container.logger(),
 				vpn_gateway=self.singleton('VPNManagementGateway'),
-				metric_service=self.singleton('VPNManagementGateway'),
+				metric_service=self.singleton('VPNMetricService'),
 				))
 
 		# Return main dApp facade that will act as API between other
