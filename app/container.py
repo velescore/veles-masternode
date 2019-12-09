@@ -5,7 +5,7 @@ from dependency_injector import containers, providers
 from blockchain import core_node_service
 from masternode import mnsync_service, signing_service
 from jobs import discovery_daemon, metric_daemon, web_server
-from controllers import masternode_status
+from controllers import masternode_status, masternode_list
 from dapps import registry
 
 
@@ -90,13 +90,20 @@ class IocContainer(containers.DeclarativeContainer):
 
     # Controllers
     controllers = {
-        'StatusController': providers.Factory(
+        'MasternodeStatusController': providers.Factory(
             masternode_status.MasternodeStatusController,
             config=app_config,
             logger=logger,
             signing_service=services['MasternodeSigningService'],
             core_node=services['CoreNodeService'],
             dapp_registry=dapp_registry
+        ),
+        'MasternodeListController': providers.Factory(
+            masternode_list.MasternodeListController,
+            config=app_config,
+            logger=logger,
+            signing_service=services['MasternodeSigningService'],
+            mnsync_service=services['MasternodeSyncService']
         )
     }
 

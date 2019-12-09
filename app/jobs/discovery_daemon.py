@@ -51,13 +51,23 @@ class DiscoveryDaemon(object):
 			if dapp_status and 'services' in dapp_status:
 				mn.update_service_info({
 					'services': list(dapp_status['services'].keys()),
-					'dapp_status': 'ENABLED',
+					'dapp_status': 'ACTIVE',	# legacy field
 					'latency_ms': service_latency
 				})
-				if 'blockchain' in dapp_status and 'api_version' in dapp_status['blockchain']:
+
+				if 'version' in dapp_status and 'api_version' in dapp_status['version']:
+					mn.update_version_info({
+						'api_version': dapp_status['version']['version'],
+						'core_version': dapp_status['version']['core_version'],
+						'mn_version': dapp_status['version']['mn_version'],
+						'protocol_version': dapp_status['version']['protocol_version'],
+					})
+				elif 'blockchain' in dapp_status and 'api_version' in dapp_status['blockchain']:	# older MN2 nodes
 					mn.update_version_info({
 						'api_version': dapp_status['blockchain']['api_version'],
-						'core_version': dapp_status['blockchain']['core_version']
+						'core_version': dapp_status['blockchain']['core_version'],
+						'mn_version': dapp_status['blockchain']['mn_version'],
+						'protocol_version': dapp_status['blockchain']['protocol_version'],
 					})
 			else:
 				mn.update_service_info({

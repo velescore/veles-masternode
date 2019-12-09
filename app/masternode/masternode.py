@@ -17,6 +17,9 @@ class CoreInfoMixin(object):
 	def update_core_info(self, core_info):
 		self._core_info.update(core_info)
 
+	def get_core_info(self):
+		return self._core_info
+
 	def attributes(self):
 		return {**super().attributes(), **self._core_info}
 
@@ -28,6 +31,9 @@ class VersionInfoMixin(object):
 	def update_version_info(self, version_info):
 		self._version_info.update(version_info)
 
+	def get_version_info(self):
+		return self._version_info
+
 	def attributes(self):
 		return {**super().attributes(), **self._version_info}
 
@@ -38,6 +44,9 @@ class ServiceInfoMixin(object):
 
 	def update_service_info(self, service_info):
 		self._service_info.update(service_info)
+
+	def get_service_info(self):
+		return self._service_info
 
 	def attributes(self):
 		return {**super().attributes(), **self._service_info}
