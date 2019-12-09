@@ -65,6 +65,10 @@ class VPNMetricService(AbstractMetricService):
 		cur_metrics_key = '%s:%s' % (self.data_prefix, now.strftime(key_timeformat))
 		cur_metrics_state = self._get_current_metrics()
 
+		if self.repo.exists(cur_metrics_key + ':state'):
+			self.logger.info('VPNMetricService::update_recent_metrics: Metrics state already saved for interval ' + interval_name)
+			return
+
 		self.repo.store(cur_metrics_key + ':state', cur_metrics_state)
 
 		if self.repo.exists(prev_metrics_key + ':state'):

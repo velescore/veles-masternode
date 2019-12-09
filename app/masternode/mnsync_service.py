@@ -14,7 +14,14 @@ class MasternodeSyncService(object):
 	def get_masternode_list(self, mode = None):
 		""" Returns masternode list, whether core or extended """
 		if mode == 'full':
-			pass
+			core_list = self.get_core_masternode_list('full')
+			stored_list = self.mn_repo.get_all()
+
+			for ip, mn in stored_list:
+				if ip in core_list:
+					stored_list[ip].update_core_info(core_list[ip].get_core_info())
+
+			return stored_list
 
 		else:
 			return self.mn_repo.get_all()
@@ -81,8 +88,8 @@ class MasternodeSyncService(object):
 				result[entry[key]] = MasternodeInfo({
 					'ip': entry['ip'],
 					'outpoint': entry['outpoint'],
-					'payee': entry['payee'],
-					'core_info': entry
+					'payee': entry['payee']
 					})
+				result[entry[key]].update_core_info(entry)
 
 		return result

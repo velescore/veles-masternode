@@ -27,7 +27,7 @@ class MasternodeRepository(object):
 
 	def get(self, ip):
 		if self.exists(ip):
-			return self._unserialize(self.gw.client.get('mnlist:entry:' + ip).decode('utf-8'))
+			return self._unserialize(self.gw.client.get('mnlist:entry:' + ip))
 		return None
 
 	def get_all(self):
@@ -41,11 +41,16 @@ class MasternodeRepository(object):
 		return result
 
 	def get_keys(self):
-		cursor, keys = self.gw.client.scan(match='mnlist:entry:*')
+		cursor, raw_keys = self.gw.client.scan(match='mnlist:entry:*')
+		keys = []
+
+		for raw_key in raw_keys:
+			keys += [raw_key.decode('utf-8').replace('mnlist:entry:', '')]
+
 		return keys
 
 	def exists(self, ip):
-		return ('mnlist:entry:' + ip) in self.data
+		return self.gw.client.get('mnlist:entry:' + ip) is not None
 
 	def delete(self, ip):
 		self.data.pop('mnlist:entry:' + ip)
@@ -54,8 +59,10 @@ class MasternodeRepository(object):
 		return pickle.dumps(obj)
 
 	def _unserialize(self, dump):
-		return pickle.loads(dump)
-
+		try:
+			return pickle.loads(dump)
+		except:
+			return None
 
 
 class MetricRepository(object):
@@ -84,7 +91,12 @@ class MetricRepository(object):
 		return result
 
 	def get_keys(self):
-		cursor, keys = self.gw.client.scan(match='metric:entry:*')
+		cursor, raw_keys = self.gw.client.scan(match='metric:entry:*')
+		keys = []
+
+		for raw_key in raw_keys:
+			keys += [raw_key.encode('utf-8')].replace('metric:entry:', '')
+
 		return keys
 
 	def exists(self, key):
