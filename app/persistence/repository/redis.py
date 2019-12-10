@@ -31,21 +31,26 @@ class MasternodeRepository(object):
 		return None
 
 	def get_all(self):
+		redis_keys = []
 		keys = self.get_keys()
-		data = self.gw.client.mget(keys)
+
+		for ip in keys:
+			redis_keys += ['mnlist:entry:' + ip]
+
+		data = self.gw.client.mget(redis_keys)
 		result = {}
 
 		for i in range(len(keys)):
-			result[keys[i]] = self._unserialize(data[i])
-
+			entry = self._unserialize(data[i])
+			if entry:
+				result[keys[i]] = entry
 		return result
 
 	def get_keys(self):
-		cursor, raw_keys = self.gw.client.scan(match='mnlist:entry:*')
 		keys = []
 
-		for raw_key in raw_keys:
-			keys += [raw_key.decode('utf-8').replace('mnlist:entry:', '')]
+		for key in self.gw.client.scan_iter("mnlist:entry:*"):
+			keys += [key.decode('utf-8').replace('mnlist:entry:', '')]
 
 		return keys
 
