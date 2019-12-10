@@ -14,10 +14,15 @@ class MasternodeListController(AbstractSigningController):
 	@asyncio.coroutine
 	def handle(self, request):
 		mode = request.match_info.get('mode', None)
+		nested = True
 
-		try:
-			mn_list = self.mnsync_service.get_masternode_list(mode)
-		except Exception as e:
-			return self.error_response('Failed to obtain masternode list', 559)	# first 4 letters of "wallet" on T9 keyboard
+		if mode == 'assoc':
+			mode = 'full'
+			nested = False
+
+		#try:
+		mn_list = self.mnsync_service.get_masternode_list(mode).attributes(nested)
+		#except Exception as e:
+		#	return self.error_response('Failed to obtain masternode list', 559)	# first 4 letters of "wallet" on T9 keyboard
 
 		return self.response(mn_list)

@@ -49,15 +49,19 @@ class DiscoveryDaemon(object):
 			dapp_status, service_latency = self.query_dapp_status(ip)
 
 			if dapp_status and 'services' in dapp_status:
+				mn.status = 'ACTIVE'
+
 				mn.update_service_info({
 					'services': list(dapp_status['services'].keys()),
-					'dapp_status': 'ACTIVE',	# legacy field
 					'latency_ms': service_latency
 				})
 
+				if 'masternode' in dapp_status and 'signing_key' in dapp_status['masternode']:
+					mn.signing_key = dapp_status['masternode']['signing_key']
+
 				if 'version' in dapp_status and 'api_version' in dapp_status['version']:
 					mn.update_version_info({
-						'api_version': dapp_status['version']['version'],
+						'api_version': dapp_status['version']['api_version'],
 						'core_version': dapp_status['version']['core_version'],
 						'mn_version': dapp_status['version']['mn_version'],
 						'protocol_version': dapp_status['version']['protocol_version'],
@@ -69,10 +73,10 @@ class DiscoveryDaemon(object):
 						'mn_version': dapp_status['blockchain']['mn_version'],
 						'protocol_version': dapp_status['blockchain']['protocol_version'],
 					})
+
 			else:
 				mn.update_service_info({
 					'services': [],
-					'dapp_status': 'INACTIVE',
 					'latency_ms': service_latency
 				})
 

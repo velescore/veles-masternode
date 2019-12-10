@@ -1,6 +1,6 @@
 """ Veles Masternode (gen 2) sync service """
 
-from masternode.masternode import MasternodeInfo
+from masternode.masternode import MasternodeInfo, MasternodeInfoList
 
 class MasternodeSyncService(object):
 	"""Service to manage extended masternode sync"""
@@ -17,14 +17,28 @@ class MasternodeSyncService(object):
 			core_list = self.get_core_masternode_list('full')
 			stored_list = self.mn_repo.get_all()
 
-			for ip, mn in stored_list:
+			for ip, mn in stored_list.items():
 				if ip in core_list:
+					if (mn.status == 'ACTIVE' and core_list[ip].status != 'ENABLED')\
+						or (not mn.status or mn.status != 'ACTIVE'):
+						mn.status = core_list[ip].status
+
 					stored_list[ip].update_core_info(core_list[ip].get_core_info())
+					stored_list[ip].update_version_info({
+						**core_list[ip].get_version_info(),
+						**mn.get_version_info(),
+						})
 
-			return stored_list
+			return MasternodeInfoList(stored_list, mode)
 
-		else:
-			return self.mn_repo.get_all()
+		else:	# simple
+			stored_list = self.mn_repo.get_all()
+			simple_list = MasternodeInfoList({})
+
+			for ip, mn in stored_list.items():
+				simple_list.add(MasternodeInfo({'ip': mn.ip, 'outpoint': mn.outpoint, 'payee': mn.payee, 'status': mn.status}))
+
+			return simple_list
 
 		self.logger.warning('MasternodeSyncService::get_masternode_list(): unknown mode "%s"' % mode)
 		return False
@@ -38,7 +52,7 @@ class MasternodeSyncService(object):
 			return False
 
 		return self.parse_core_mnlist(raw_list, mode)
-		
+
 	def update_masternode_list(self, masternode):
 		self.mn_repo.store(masternode)
 
@@ -64,7 +78,6 @@ class MasternodeSyncService(object):
 		for outpoint, info_str in mn_list.items():
 			if not info_str:
 				continue
-
 			info = info_str.split()
 			entry = {core_default_key: outpoint}
 
@@ -88,8 +101,18 @@ class MasternodeSyncService(object):
 				result[entry[key]] = MasternodeInfo({
 					'ip': entry['ip'],
 					'outpoint': entry['outpoint'],
-					'payee': entry['payee']
+					'payee': entry['payee'],
+					'status': entry['status'],
+					'_core_node_info': entry
 					})
-				result[entry[key]].update_core_info(entry)
+				result[entry[key]].update_core_info({
+					'active_seconds': entry['active_seconds'],
+					'last_paid_block': entry['last_paid_block'],
+					'last_paid_time': entry['last_paid_time'],
+					'last_seen': entry['last_seen'],
+					})
+				result[entry[key]].update_version_info({
+					'protocol_version': entry['protocol'],
+					})
 
 		return result
