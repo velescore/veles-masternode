@@ -7,20 +7,17 @@ class MasternodeListController(AbstractSigningController):
 		super().__init__(config, logger, signing_service)
 		self.mnsync_service = mnsync_service
 
+	def set_routes(self, router):
+		router.add_get('/api/mn/list', self.handle)
+		router.add_get('/api/mn/list/{mode}', self.handle)
+
 	@asyncio.coroutine
 	def handle(self, request):
+		mode = request.match_info.get('mode', None)
+
 		try:
-			mn_list = self.mnsync_service.get_masternode_list()
+			mn_list = self.mnsync_service.get_masternode_list(mode)
 		except Exception as e:
-			self.logger.error('Failed to obtain masternode list: ' + str(e))
 			return self.error_response('Failed to obtain masternode list', 559)	# first 4 letters of "wallet" on T9 keyboard
 
-		return self.response(self._normalize(mn_list))
-
-	def _normalize(self, mn_list):
-		result = {}
-
-		for ip, mn in mn_list.items():
-			result[ip] = mn.attributes()
-
-		return result
+		return self.response(mn_list)
