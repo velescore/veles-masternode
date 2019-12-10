@@ -9,12 +9,19 @@ class AbstractController(object, metaclass=ABCMeta):
 	headers_json = {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"}
 	headers_html = {"Content-Type": "text/html"}
 
+	## Required abstract methods
 	@abstractmethod
 	@asyncio.coroutine
 	def handle(self, request):
 		""" Accepts web.Request and should return web.Response object """
 		pass
 
+	@abstractmethod
+	def set_routes(self, router):
+		""" Accepts aiohttp.Router and defines routes used by controller """
+		pass
+
+	## Common controller functionality implementation
 	def __init__(self, config, logger):
 		self.config = config
 		self.logger = logger

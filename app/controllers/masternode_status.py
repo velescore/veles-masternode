@@ -8,6 +8,9 @@ class MasternodeStatusController(AbstractSigningController):
 		self.core = core_node
 		self.dapps = dapp_registry.get_all()
 
+	def set_routes(self, router):
+		router.add_get('/api/status', self.handle)
+
 	@asyncio.coroutine
 	def handle(self, request):
 		try:

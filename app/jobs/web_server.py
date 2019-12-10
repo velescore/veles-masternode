@@ -25,8 +25,10 @@ class WebServer(object):
 
 		self.logger.info('WebServer::http_handler_task: Starting asynchronous http_handler_task [%s:%s] ' % (self.conf('addr', '127.0.0.1'), str(self.conf('port', 21340))))
 		app.router.add_get('/', self.handle_index)
-		app.router.add_get('/api/status', self.controllers['MasternodeStatusController']().handle)
-		app.router.add_get('/api/mn/list', self.controllers['MasternodeListController']().handle)
+
+		# Let controllers define their routes
+		for controller in self.controllers.values():
+			controller().set_routes(app.router)
 
 		handler = app.make_handler()
 		task = asyncio.get_event_loop().create_server(
