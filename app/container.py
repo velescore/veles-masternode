@@ -3,7 +3,7 @@
 import main, appconfig, logging
 from dependency_injector import containers, providers
 from blockchain import core_node_service
-from masternode import mnsync_service, signing_service
+from masternode import mnsync_service, signing_service, remote
 from jobs import discovery_daemon, metric_daemon, web_server
 from controllers import masternode_status, masternode_list
 from dapps import registry
@@ -51,6 +51,11 @@ class IocContainer(containers.DeclarativeContainer):
                 mem.MetricRepository
             )
         } 
+    masternode_gateway = providers.Singleton(
+        remote.RemoteMasternodeGateway,
+        config=app_config,
+        logger=logger
+    )
 
     # Services
     services = {
@@ -112,6 +117,7 @@ class IocContainer(containers.DeclarativeContainer):
         'DiscoveryDaemon': providers.Factory(
             discovery_daemon.DiscoveryDaemon,
             mnsync_service=services['MasternodeSyncService'],
+            masternode_gateway=masternode_gateway,
             config=app_config,
             logger=logger
         ),

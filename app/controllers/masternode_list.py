@@ -16,6 +16,10 @@ class MasternodeListController(AbstractSigningController):
 		mode = request.match_info.get('mode', None)
 		nested = True
 
+		# Pseudo-modes to affect nesting behaviour
+		if not mode:
+			nested = False 
+
 		if mode == 'assoc':
 			mode = 'full'
 			nested = False

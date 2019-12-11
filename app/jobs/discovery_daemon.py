@@ -4,13 +4,12 @@ import requests, json, time, asyncio
 
 class DiscoveryDaemon(object):
 	"""Service to manage extended masternode sync"""
-	headers = {"Server": "Veles Core Masternode (DiscoveryDaemon)"}
-
-	def __init__(self, mnsync_service, logger, config):
+	def __init__(self, config, logger, mnsync_service, masternode_gateway):
 		"""Constructor"""
 		self.mnsync_service = mnsync_service
 		self.logger = logger
 		self.config = config
+		self.gw = masternode_gateway
 
 	def start_job(self):
 		""" Starts service discovery job """
@@ -46,66 +45,38 @@ class DiscoveryDaemon(object):
 
 		for ip, mn in mn_list.items():
 			self.logger.debug(pref + ': query ' + mn.ip)
-			dapp_status, service_latency = self.query_dapp_status(ip)
+			query = self.gw.webapi_query(mn.ip, 'status')
 
-			if dapp_status and 'services' in dapp_status:
-				mn.status = 'ACTIVE'
+			if query.success:
+				if 'services' in query.result and 'blockchain' in query.result and 'masternode' in query.result:
+					mn.status = 'ACTIVE'
 
-				mn.update_service_info({
-					'services': list(dapp_status['services'].keys()),
-					'latency_ms': service_latency
-				})
-
-				if 'masternode' in dapp_status and 'signing_key' in dapp_status['masternode']:
-					mn.signing_key = dapp_status['masternode']['signing_key']
-
-				if 'version' in dapp_status and 'api_version' in dapp_status['version']:
-					mn.update_version_info({
-						'api_version': dapp_status['version']['api_version'],
-						'core_version': dapp_status['version']['core_version'],
-						'mn_version': dapp_status['version']['mn_version'],
-						'protocol_version': dapp_status['version']['protocol_version'],
+					mn.update_service_info({
+						'services_available': list(query.result['services'].keys()),
+						'api_latency': query.latency
 					})
-				elif 'blockchain' in dapp_status and 'api_version' in dapp_status['blockchain']:	# older MN2 nodes
+
+					if 'signing_key' in query.result['masternode']:
+						mn.signing_key = query.result['masternode']['signing_key']
+
+				if 'version' in query.result and 'api_version' in query.result['version']:
 					mn.update_version_info({
-						'api_version': dapp_status['blockchain']['api_version'],
-						'core_version': dapp_status['blockchain']['core_version'],
-						'mn_version': dapp_status['blockchain']['mn_version'],
-						'protocol_version': dapp_status['blockchain']['protocol_version'],
+						'api_version': query.result['version']['api_version'],
+						'core_version': query.result['version']['core_version'],
+						'mn_version': query.result['version']['mn_version'],
+						'protocol_version': query.result['version']['protocol_version'],
+					})
+				elif 'blockchain' in query.result and 'api_version' in query.result['blockchain']:	# older MN2 nodes
+					mn.update_version_info({
+						'api_version': query.result['blockchain']['api_version'],
+						'core_version': query.result['blockchain']['core_version'],
+						'mn_version': query.result['blockchain']['mn_version'],
+						'protocol_version': query.result['blockchain']['protocol_version'],
 					})
 
 			else:
 				mn.update_service_info({
 					'services': [],
-					'latency_ms': service_latency
 				})
 
 			self.mnsync_service.update_masternode_list(mn)
-
-	def query_dapp_status(self, node_ip, method = 'status', api_dir = 'api'):
-		url = 'https://%s/%s/%s' % (node_ip, api_dir, method)
-		request_start = time.time()
-
-		try:
-			response = requests.get(url, headers=self.headers, verify=self.config['discovery'].get('ca_cert', False), timeout=int(self.config['discovery'].get('query_timeout', 10)))	#self.config['discovery'].get('ca_cert', '/etc/veles/vpn/keys/ca.crt'))
-
-			if 'error' in response.json() and response.json()['error'] != None:
-				return False
-
-			result = response.json()['result']
-
-		except Exception as e:
-			self.logger.error('DiscoveryDaemon::query_dapp_status: Error: ' + str(e))
-			result = False
-
-		request_end = time.time()
-
-		return result, round((request_end - request_start) * 1000)
-
-
-
-
-
-
-
-		
