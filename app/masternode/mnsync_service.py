@@ -36,7 +36,18 @@ class MasternodeSyncService(object):
 			simple_list = MasternodeInfoList({})
 
 			for ip, mn in stored_list.items():
-				simple_list.add(MasternodeInfo({'ip': mn.ip, 'outpoint': mn.outpoint, 'payee': mn.payee, 'status': mn.status}))
+				services_available = []
+
+				if 'services_available' in mn.get_service_info().keys():
+					services_available =  mn.get_service_info()['services_available']
+
+				simple_list.add(MasternodeInfo({
+					'ip': mn.ip, 
+					'outpoint': mn.outpoint, 
+					'payee': mn.payee, 
+					'status': mn.status,
+					'services_available': services_available
+					}))
 
 			return simple_list
 
