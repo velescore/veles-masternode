@@ -1,5 +1,0 @@
-#!/usr/bin/python3
-import json, requests
-
-class VelesRPCClient(object):
-	def __init__(self, host = "127.0.0.1", port = 25522, username = None, password = None):
