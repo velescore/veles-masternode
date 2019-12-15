@@ -1,0 +1,15 @@
+# File privileges and ownership that needs to be set
+# when masternode snapshot is installed to the system
+/etc/veles/veles.conf				600	velesmn-core
+/usr/share/veles/easy-rsa			700	velesmn-httpd
+/var/lib/veles/wallet				700	velesmn-core
+#/var/lib/veles/web					770	velesmn-httpd
+/var/lib/veles/masternode			755	velesmn-system
+/var/lib/veles/redis				700	velesmn-redis
+/var/log/veles/redis				700	velesmn-redis
+/etc/veles/vpn/keys/stunnel.key		600	velesmn-stunnel
+/etc/veles/vpn/keys/stunnel.crt		600	velesmn-stunnel
+/etc/veles/vpn/keys/ca.crt			644	root
+/etc/veles/vpn/keys/server.key		600	root
+/etc/veles/vpn/keys/server.crt		644	root
+/usr/libexec/veles/veles-mn.start	754	root	
