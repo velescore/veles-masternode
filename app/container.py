@@ -1,4 +1,5 @@
-"""Example of dependency injection in Python."""
+""" Main dependency injection container for Veles Masternode,
+    simple declarative container until the projects gets bigger """
 
 import main, appconfig, logging
 from dependency_injector import containers, providers
@@ -11,7 +12,7 @@ from dapps import registry
 
 class IocContainer(containers.DeclarativeContainer):
     """Application IoC container."""
-    db_type = 'mem'
+    db_type = 'redis'
     config = providers.Configuration('config')
     logger = providers.Singleton(logging.Logger, name='VelesMasternode')
 
@@ -85,12 +86,13 @@ class IocContainer(containers.DeclarativeContainer):
 
     # Repos/Services accessible for other provider classes
     metric_repository = repos['MetricRepository']
-     
+    mn_signing_service = services['MasternodeSigningService']
+
     # Dapps
     dapp_registry = providers.Factory(
         registry.dAppRegistry,
         config=app_config,
-        logger=logger
+        logger=logger,
     )
 
     # Controllers
@@ -131,6 +133,7 @@ class IocContainer(containers.DeclarativeContainer):
         'WebServer': providers.Factory(
             web_server.WebServer,
             controllers=controllers,
+            dapp_registry=dapp_registry,
             config=app_config,
             logger=logger
         ),
@@ -143,3 +146,5 @@ class IocContainer(containers.DeclarativeContainer):
         jobs=jobs
         )
 
+    get_controllers = providers.Object(controllers)
+    get_services = providers.Object(services)

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 from dapps.interfaces import AbstractProvider
-from dapps.vpn import facade, dummy, status_service, metric_service
+from dapps.vpn import facade, status_service, metric_service, certificate_service, config_service, gateway
+from dapps.vpn.controllers import dvpn_config
 
 class dAppProvider(AbstractProvider):
 	dapp_name = 'VPN'
-	dependencies = {}
-	db_type = 'mem'
-	gw_type = 'dummy'
+	services = {}
 
 	def __init__(self, container):
 		self.container = container
@@ -15,45 +14,52 @@ class dAppProvider(AbstractProvider):
 	def name(self):
 		return self.dapp_name
 
-	def register(self, name, dependency):
-		if not name in self.dependencies:
-			self.dependencies[name] = dependency
+	def register_services(self, dapp_registry):
+		dapp_registry.register_service('VPNManagementGateway', gateway.VPNManagementGateway(
+			config=self.container.app_config(), 
+			logger=self.container.logger(),
+			))
+		dapp_registry.register_service('VPNMetricService', metric_service.VPNMetricService(
+			config=self.container.app_config(), 
+			logger=self.container.logger(),
+			metric_repository=self.container.metric_repository(),
+			))
+		dapp_registry.register_service('VPNStatusService', status_service.VPNStatusService(
+			config=self.container.app_config(), 
+			logger=self.container.logger(),
+			vpn_gateway=dapp_registry.get_service('VPNManagementGateway'),
+			metric_service=dapp_registry.get_service('VPNMetricService'),
+			))
+		dapp_registry.register_service('CertificateProvisioningService', certificate_service.CertificateProvisioningService(
+			config=self.container.app_config(), 
+			logger=self.container.logger(),
+			))
+		dapp_registry.register_service('ConfigProvisioningService', config_service.ConfigProvisioningService(
+			config=self.container.app_config(), 
+			logger=self.container.logger(),
+			))
 
-	def singleton(self, name):
-		if name in self.dependencies:
-			return self.dependencies[name]
-		return None
-
-	def make_facade(self):
-		if self.gw_type == 'dummy':
-			from dapps.vpn import dummy
-
-			self.register('DummyVPNManagementGateway', dummy.DummyVPNManagementGateway())
-		else:
-			from dapps.vpn import gateway
-
-			self.register('VPNManagementGateway', gateway.VPNManagementGateway(
-					config=self.container.app_config(), 
-					logger=self.container.logger(),
-					))
-
-		self.register('VPNMetricService', metric_service.VPNMetricService(
-				config=self.container.app_config(), 
-				logger=self.container.logger(),
-				metric_repository=self.container.metric_repository(),
-				))
-		self.register('VPNStatusService', status_service.VPNStatusService(
-				config=self.container.app_config(), 
-				logger=self.container.logger(),
-				vpn_gateway=self.singleton('VPNManagementGateway'),
-				metric_service=self.singleton('VPNMetricService'),
-				))
+	def make_facade(self, dapp_registry):
+		self.register_services(dapp_registry)
 
 		# Return main dApp facade that will act as API between other
 		# parts of system and internal services registered here.
 		return facade.VPNdAppFacade(
 			config=self.container.app_config(), 
 			logger=self.container.logger(),
-			status_service=self.singleton('VPNStatusService'),
-			metric_service=self.singleton('VPNMetricService')
+			status_service=dapp_registry.get_service('VPNStatusService'),
+			metric_service=dapp_registry.get_service('VPNMetricService')
+			)
+
+	def make_controller(self, dapp_registry):
+		self.register_services(dapp_registry)
+
+		# Return main dApp facade that will act as API between other
+		# parts of system and internal services registered here.
+		return dvpn_config.ConfigProvisioningController(
+			config=self.container.app_config(), 
+			logger=self.container.logger(),
+			signing_service=self.container.mn_signing_service(),
+			certificate_service=dapp_registry.get_service('CertificateProvisioningService'),
+			config_service=dapp_registry.get_service('ConfigProvisioningService'),
 			)

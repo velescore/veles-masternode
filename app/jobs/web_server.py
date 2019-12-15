@@ -7,8 +7,9 @@ class WebServer(object):
 	headers_json = {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"}
 	headers_html = {"Content-Type": "text/html"}
 
-	def __init__(self, controllers, config, logger):
+	def __init__(self, controllers, dapp_registry, config, logger):
 		self.controllers = controllers
+		self.dapp_controllers = dapp_registry.get_all_controllers()
 		self.config = config
 		self.logger = logger
 
@@ -29,6 +30,8 @@ class WebServer(object):
 		# Let controllers define their routes
 		for controller in self.controllers.values():
 			controller().set_routes(app.router)
+		for controller in self.dapp_controllers.values():
+			controller.set_routes(app.router)
 
 		handler = app.make_handler()
 		task = asyncio.get_event_loop().create_server(

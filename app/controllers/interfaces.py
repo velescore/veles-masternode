@@ -34,11 +34,17 @@ class AbstractController(object, metaclass=ABCMeta):
 			"X-Veles-Api-Version": version.api_version
 			})
 
-	def response(self, data, extra_headers={}):
-		return self.json_response({
-			'status': 'success',
-			'result': data
-			}, extra_headers=extra_headers)
+	def response(self, data, headers=None, extra_headers={}):
+		if headers:
+			return web.Response(
+				text=data, 
+				headers=self.add_signature_headers({**self.headers_common, **headers}, body, cb='relaxed')
+				)
+		else:
+			return self.json_response({
+				'status': 'success' if data else 'error',
+				'result': data
+				}, extra_headers=extra_headers)
 
 
 	def error_response(self, message, code=-8673, extra_headers={}):
