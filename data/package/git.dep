@@ -1,0 +1,4 @@
+# Dependencies that need to be cloned and installed
+# from a github repo.
+# Repo address						Installation command from inside the repo directory
+https://github.com/velescore/openvpn-api	git checkout "v0.1.2" ; python3 setup.py "install"
