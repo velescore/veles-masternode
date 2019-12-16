@@ -1,5 +1,0 @@
-# Packages that needs to be installed through pip3
-setuptools
-aiohttp
-requests
-redis

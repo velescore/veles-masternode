@@ -1,8 +1,8 @@
 #!/bin/bash
-# Makes snapshot from dev machine to files directory
+# Makes package from dev machine to files directory
 export PACKAGE_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 export DATA_DIR="${PACKAGE_DIR}/data"
-export ROOT_PREFIX=""
+export ROOT_PREFIX="/"
 export DIST_PREFIX="${DATA_DIR}/dist"
 export LOG_FILE="/tmp/velesmn-install.log"
 
@@ -27,7 +27,7 @@ show_help() {
 
 show_intro() {
   show_logo
-  echo "Starting Veles Masternode 2g Installator ..."
+  echo "[ Welcome to Veles Core Masternode Installator ]"
   sleep 1
 }
 
@@ -36,7 +36,7 @@ if [ "$1" == "" ] || [ "$1" == "install" ]; then
   # Save current path, restore later
   PWD=$( pwd )
   cd ${DATA_DIR}
-  ${PACKAGE_DIR}/bin/snapshot install
+  source ${PACKAGE_DIR}/bin/packager install
   cd ${PWD}
 elif [ "$1" == "--help" ] || [ "$1" == "help" ]; then
   show_help

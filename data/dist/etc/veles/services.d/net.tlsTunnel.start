@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# Create /run dures and so
-source /etc/veles/services.d/net.tlsTunnel.onboot
-
-# Run the daemon
-/usr/bin/stunnel4 /etc/veles/vpn/stunnel.conf
