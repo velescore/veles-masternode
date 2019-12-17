@@ -3,8 +3,6 @@
 /usr/lib/veles
 /usr/libexec/veles
 /usr/share/veles
-/usr/bin/velesd
-/usr/bin/veles-cli
 /usr/bin/velesctl
 /var/lib/veles/web
 /var/log/veles

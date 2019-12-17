@@ -77,7 +77,7 @@ install_dialog_deps() {
 }
 
 #fetch_mn_state() {
-#	veles-cli masternode status | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])"
+#	veles-cli -conf=/etc/veles/veles.conf masternode status | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])"
 #}
 
 check_mn_key() {
@@ -328,13 +328,13 @@ first_run_wizard() {
 		if velesctl status system.wallet.velesCoreDaemon | grep RUNNING > /dev/null; then
 
 			if grep MASTERNODE_KEY_UNSET /etc/veles/veles.conf > /dev/null; then
-				mnkey=$(veles-cli masternode genkey)
+				mnkey=$(veles-cli -conf=/etc/veles/veles.conf masternode genkey)
 				mn_dialog --infobox 'Loading Veles Core wallet... ' 4 45
 
 				while ! check_mn_key ${mnkey}; do
 					mn_dialog --tailbox /var/lib/veles/wallet/debug.log 20 165 &
 					sleep 10
-					mnkey=$(veles-cli masternode genkey)
+					mnkey=$(veles-cli -conf=/etc/veles/veles.conf masternode genkey)
 				done
 				killall dialog
 
@@ -346,7 +346,7 @@ first_run_wizard() {
 					mn_dialog --infobox 'Patching /etc/veles/veles.conf ...' 3 40
 					sed -i "s/[# ]masternodeprivkey=MASTERNODE_KEY_UNSET/masternodeprivkey=${mnkey}/g" /etc/veles/veles.conf
 					sed -i 's/[# ]masternode=0/masternode=1/g' /etc/veles/veles.conf
-					mn_dialog --infobox 'Restarting Veles Core: Sarting daemon ... (this might take a while)' 4 45
+					mn_dialog --infobox 'Restarting Veles Core: Starting daemon ... (this might take a while)' 4 45
 					velesctl start system.wallet.velesCoreDaemon > /dev/null
 				else
 					if [ -f /var/lib/veles/wallet/debug.log ]; then
@@ -359,13 +359,13 @@ first_run_wizard() {
 			fi
 
 			if grep SIGNING_KEY_UNSET /etc/veles/mn.conf > /dev/null; then
-				sigkey=$(veles-cli getnewaddress legacy)
+				sigkey=$(veles-cli -conf=/etc/veles/veles.conf getnewaddress legacy)
 				mn_dialog --infobox 'Loading Veles Core wallet... ' 4 45
 
 				while ! check_signing_key ${sigkey}; do
 					mn_dialog --tailbox /var/lib/veles/wallet/debug.log 20 165 &
-					sleep 10
-					sigkey=$(veles-cli getnewaddress legacy)
+					sleep 30
+					sigkey=$(veles-cli -conf=/etc/veles/veles.conf getnewaddress legacy)
 				done
 				killall dialog
 
@@ -405,7 +405,7 @@ first_run_wizard() {
 		velesctl status | mn_dialog --programbox 15 65
 		exit 1
 	else
-		mn_dialog --ok-label "Finish" --msgbox 'Veles Core Masternode 2nd gen. has been succesfully installed! Check your node status anytime by typing: "veles-cli masternode status" and the state of all sub-services using "velesctl status": ' 10 55
+		mn_dialog --ok-label "Finish" --msgbox 'Veles Core Masternode 2nd gen. has been succesfully installed! Check your node status anytime by typing: "veles-cli -conf=/etc/veles/veles.conf masternode status" and the state of all sub-services using "velesctl status": ' 10 55
 		exit 0
 	fi
 }
