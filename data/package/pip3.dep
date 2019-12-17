@@ -3,3 +3,4 @@ setuptools
 aiohttp
 requests
 redis
+dependency_injector
