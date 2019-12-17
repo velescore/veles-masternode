@@ -8,7 +8,8 @@ chown veles /var/run/veles
 chmod 775 /var/run/veles
 
 # Run first-run scripts, to create /run dirs, etc.
-/etc/veles/services.d/*.onboot
+/etc/veles/services.d/net.tlsTunnel.onboot
+/etc/veles/services.d/db.redisServer.onboot
 
 # Run proccess controller
 /usr/bin/supervisord -c  /etc/veles/velesctl.conf #--nodaemon
