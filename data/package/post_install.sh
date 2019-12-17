@@ -31,6 +31,7 @@ do_post_install() {
 	sed -i 's/^[# ]*DEFAULT_FORWARD_POLICY=.*$/# Updated for Veles Core dVPN: ACCEPT\nDEFAULT_FORWARD_POLICY="ACCEPT"/g'
 
 	# Open neccessary ports
+	ufw allow 22/tcp comment 'SSH [added by Veles MN]'
 	ufw allow 53/tcp comment 'Veles Masternode dVPN: DNS'
 	ufw allow 53/udp comment 'Veles Masternode dVPN: DNS'
 	ufw allow 443/tcp comment 'Veles Masternode dVPN: HTTPS/multiprotocol'
