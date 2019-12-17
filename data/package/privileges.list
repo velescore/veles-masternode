@@ -13,3 +13,5 @@
 /etc/veles/vpn/keys/server.key		600	root
 /etc/veles/vpn/keys/server.crt		644	root
 /usr/libexec/veles/veles-mn.start	754	root	
+/etc/veles/services.d/net.tlsTunnel.onboot	755 root
+/etc/veles/services.d/db.redisServer.onboot	755 root
