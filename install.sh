@@ -5,6 +5,8 @@ export DATA_DIR="${PACKAGE_DIR}/data"
 export ROOT_PREFIX="/"
 export DIST_PREFIX="${DATA_DIR}/dist"
 export LOG_FILE="/tmp/velesmn-install.log"
+export CORE_RELEASE_URL="https://github.com/velescore/veles/releases/download/v0.18.1.3/veles-0.18.1.3-generic-linux-amd64.tar.gz"
+export CORE_RELEASE_DIR="veles-linux-amd64"
 
 show_logo() {
   echo " ____   ____     .__                _________                       

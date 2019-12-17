@@ -51,6 +51,10 @@ do_post_install() {
                 sed -i "s/masternodeprivkey=/#masternodeprivkey=/g" /etc/veles/veles.conf
                 sed -i "s/masternode=1/#masternode=0/g" /etc/veles/veles.conf
         fi
+        # If signing key is not set, disable it for now
+        if grep SIGNING_KEY_UNSET /etc/veles/mn.conf > /dev/null; then
+                sed -i "s/signing_key=/#signing_key=/g" /etc/veles/mn.conf
+        fi
 
         ## Install Veles CA, generate and copy server certificates
 	source package/easy-rsa/install_ca.sh

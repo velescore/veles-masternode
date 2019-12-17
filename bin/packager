@@ -7,6 +7,7 @@
 check_env() {
   if [ -z ${ROOT_PREFIX+x} ]; then echo 'You need to export ROOT_PREFIX variable first, "" is default'; exit 1; fi
   if [ -z ${DIST_PREFIX+x} ]; then echo 'You need to export DIST_PREFIX variable first, for example /root/veles-masternode/data/dist'; exit 1; fi
+  if [ -z ${LOG_FILE+x} ]; then LOG_FILE="/tmp/velesmn-install.log"; fi
 }
 
 unparse_ports() {
@@ -233,14 +234,17 @@ mn_restore() {
   cd ${DATA_DIR}
   source "package/config_dialog.sh"
 
+  echo "Starting Veles Masternode installation" > $LOG_FILE
+  date >> $LOG_FILE
   pre_config_wizard "package/vars.cf" || exit 0
   wiz_info_tiny "Installing dependencies ..."
   install_deps >> $LOG_FILE 2>&1
+  wiz_info_tiny "Installing latest Veles Core ..."
+  install_daemon "${CORE_RELEASE_URL}" "${CORE_RELEASE_DIR}" >> $LOG_FILE 2>&1
   wiz_info_tiny "Preparing instalaltion files ..."
   parse_vars >> $LOG_FILE 2>&1
   wiz_info_tiny "Creating user accounts ..."
   install_users >> $LOG_FILE 2>&1
-  #apply_privileges > /dev/null
   stop_service 2> /dev/null
   cleanup_system >> $LOG_FILE 2>&1
   wiz_info_tiny "Preparing installation files ..."
@@ -261,6 +265,29 @@ mn_restore() {
   first_run_wizard || exit 0
 
   cd ${PWD}
+}
+
+install_daemon() {
+  temp_dir='/tmp/veles-core'
+  release_url="${1}"
+  core_dir="${2}"  
+  tar_file=$( basename "${release_url}" )
+
+  pwd=$( pwd )
+  mkdir -p $temp_dir 2> /dev/null
+  cd $temp_dir
+  wget "${release_url}"
+  tar xvf "${tar_file}"
+  cp -av "${core_dir}/velesd" /usr/bin/velesd
+  cp -av "${core_dir}/veles-cli" /usr/bin/veles-cli
+  cp -av "${core_dir}/veles-tx" /usr/bin/veles-tx
+  chmod 755 /usr/bin/velesd
+  chmod 755 /usr/bin/veles-cli 
+  chmod 755 /usr/bin/veles-tx 
+  rm -r "${tar_file}"
+  rm -r "${core_dir}"
+  cd "$pwd"
+  rm -r "${temp_dir}"
 }
 
 cleanup_system() {

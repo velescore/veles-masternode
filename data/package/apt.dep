@@ -1,4 +1,5 @@
 ## Packages that needs to be installed through apt
+wget
 supervisor
 ufw
 sslh
