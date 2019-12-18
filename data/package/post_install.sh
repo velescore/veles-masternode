@@ -28,7 +28,7 @@ do_post_install() {
 	sysctl -p
 
 	# Ufw config update for packet forwarding
-	sed -i 's/^[# ]*DEFAULT_FORWARD_POLICY=.*$/# Updated for Veles Core dVPN: ACCEPT\nDEFAULT_FORWARD_POLICY="ACCEPT"/g'
+	sed -i 's/^[# ]*DEFAULT_FORWARD_POLICY=.*$/# Updated for Veles Core dVPN: ACCEPT\nDEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
 
 	# Open neccessary ports
 	ufw allow 22/tcp comment 'SSH [added by Veles MN]'
