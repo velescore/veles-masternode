@@ -33,6 +33,10 @@ show_intro() {
   sleep 1
 }
 
+if [ "$2" == "--non-interactive" ]; then
+  export NON_INTERACTIVE=1
+fi
+
 if [ "$1" == "" ] || [ "$1" == "install" ]; then
   show_intro
   # Save current path, restore later

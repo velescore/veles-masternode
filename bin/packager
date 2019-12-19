@@ -122,7 +122,7 @@ install_apt_deps() {
   to_install=""
 
   echo " * Checking installed apt dependencies ..."
-        while read line; do
+  while read line; do
     if $(echo $line | grep '#' > /dev/null); then
       continue
     fi
@@ -135,7 +135,7 @@ install_apt_deps() {
       to_install="${to_install} ${line}"
       echo "no"
     fi
-        done < package/apt.dep
+  done < package/apt.dep
 
   if [ "${to_install}" == "" ]; then
     echo " * Nothing to install, all apt dependencies satisfied"
@@ -143,6 +143,26 @@ install_apt_deps() {
     echo " * Installing following apt packages: ${to_install}"
     apt-get install --no-install-recommends -y ${to_install}
   fi
+
+  # Ensure pre-installed services doesn't start after boot,
+  # only ufw - the rest is started by velesctl
+  while read line; do
+    if $(echo $line | grep '#' > /dev/null); then
+      continue
+    fi
+
+    if [[ "${line}" == "ufw" ]]; then
+      echo -n "   Enabling ufw service ... "
+      ufw allow 22/tcp comment 'SSH [added by Veles MN]'
+      systemctl enable ufw
+      systemctl start ufw
+
+    elif [ -f "/etc/systemd/system/${line}.service" ]; then
+      echo -n "   Disabling preinstalled ${line} service ... " 
+      systemctl stop "${line}"
+      systemctl disable "${line}"
+    fi
+  done < package/apt.dep
 }
 
 install_pip3_deps() {
@@ -169,23 +189,23 @@ install_pip3_deps() {
 
 install_git_deps() {
   echo " * Checking dependencies that need to be installed from source ..."
-        while read line; do
-    if $(echo $line | grep '#' > /dev/null); then
-      continue
-    fi
+    while read line; do
+      if $(echo $line | grep '#' > /dev/null); then
+        continue
+      fi
 
-    repo=$(echo $line | awk '{print $1}')
-    install_cmd=$(echo $line | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')
-    pwd=$(pwd)
-    mkdir /tmp/veles.package > /dev/null
-    rm -r /tmp/veles.package/*
-    cd /tmp/veles.package
-    git clone "${repo}"
-    cd $(basename "${repo}")
-    bash -c "${install_cmd}"
-    cd "$pwd"
-
-        done < package/git.dep
+      repo=$(echo $line | awk '{print $1}')
+      install_cmd=$(echo $line | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+      pwd=$(pwd)
+      mkdir /tmp/veles.package 2> /dev/null
+      rm -r /tmp/veles.package/*
+      cd /tmp/veles.package
+      git clone "${repo}"
+      cd $(basename "${repo}")
+      bash -c "${install_cmd}"
+      cd "$pwd"
+    done < package/git.dep
+    rm -r /tmp/veles.package
 }
 
 install_deps() {
@@ -236,6 +256,7 @@ mn_restore() {
 
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date >> $LOG_FILE
+  grep version ../application/version.py >> $LOG_FILE
   pre_config_wizard "package/vars.cf" || exit 0
   wiz_info_tiny "Installing dependencies ..."
   install_deps >> $LOG_FILE 2>&1
@@ -263,6 +284,47 @@ mn_restore() {
   wiz_info_tiny "Launching systemd service ..."
   launch_service >> $LOG_FILE 2>&1
   first_run_wizard || exit 0
+
+  cd ${PWD}
+}
+
+# Same as mn_restore but without user interaction, we need to make sure
+# that steps below are exactly tha same as in mn_restore
+mn_restore_auto() {
+  PWD=$( pwd )
+  cd ${DATA_DIR}
+  source "package/config_dialog.sh"
+
+  echo "Starting Veles Masternode installation" > $LOG_FILE
+  date
+  grep version ../application/version.py
+  pre_config_auto "package/vars.cf"   || exit 0
+  echo "[auto] Installing dependencies ..."
+  install_deps
+  echo "[auto] Installing latest Veles Core ..."
+  install_daemon "${CORE_RELEASE_URL}" "${CORE_RELEASE_DIR}"
+  echo "[auto] Preparing instalaltion files ..."
+  parse_vars
+  echo "[auto] Creating user accounts ..."
+  install_users
+  stop_service 2> /dev/null
+  cleanup_system
+  echo "[auto] Preparing installation files ..."
+  pre_install # | wiz progress
+  echo "[auto] Copying system files ..."
+  copy_package "${DIST_PREFIX}" "${ROOT_PREFIX}" "restore" #| wiz_progress
+  echo "[auto] Generating new certificates ..."
+  post_install  #| wiz progress
+  echo "[auto] Copying application files ..."
+  copy_app "${PACKAGE_DIR}"
+  post_config_auto || exit 0
+  echo "[auto] Setting up file privileges ..."
+  apply_privileges 
+  echo "[auto] Setting up systemd service ..."
+  setup_service
+  echo "[auto] Launching systemd service ..."
+  launch_service
+  first_run_auto  || exit 0
 
   cd ${PWD}
 }
@@ -367,7 +429,11 @@ fi
 check_env
 
 if [ "$1" == "install" ]; then
-  mn_restore
+  if [[ "${NON_INTERACTIVE}" == 1 ]]; then
+    mn_restore_auto
+  else
+    mn_restore
+  fi
 
 elif [ "$1" == "make_install" ]; then
   mn_backup
