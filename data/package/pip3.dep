@@ -1,5 +1,6 @@
 # Packages that needs to be installed through pip3
 setuptools
+wheel
 aiohttp
 requests
 redis
