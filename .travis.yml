@@ -11,6 +11,6 @@ jobs:
       script:
          - travis_retry sudo make test_install
     - stage: test
-      name: 'Ubuntu [latest] 19.04 (Disco Dingo), update [GOAL: install] '
+      name: 'Ubuntu 19.04 (Disco Dingo), update [GOAL: install] '
       script:
-         - travis_retry sudo docker run --rm=true -v `pwd`:/veles-masternode:rw ubuntu:latest /bin/bash -c "apt-get update ; apt-get install -q -y wget curl make procps python ; cd /veles-masternode/; make docker_test_install"
+         - travis_retry sudo docker run --rm=true -v `pwd`:/veles-masternode:rw ubuntu:19.04 /bin/bash -c "apt-get update ; apt-get install -q -y wget curl make procps python ; cd /veles-masternode/; make docker_test_install"
