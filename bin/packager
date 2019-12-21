@@ -141,7 +141,12 @@ install_apt_deps() {
     echo " * Nothing to install, all apt dependencies satisfied"
   else
     echo " * Installing following apt packages: ${to_install}"
+    # Update first, load the preconfigured choices
     apt-get update
+    apt-get install debconf-utils
+    grep -v '#' package/apt.choices | debconf-set-selections
+
+    # Install the packages
     apt-get install --no-install-recommends -y ${to_install}
   fi
 

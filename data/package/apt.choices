@@ -1,0 +1,2 @@
+# Automatic answers when apt-get asks for choice
+sslh	sslh/inetd_or_standalone	select standalone
