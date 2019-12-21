@@ -203,8 +203,8 @@ install_git_deps() {
       repo=$(echo $line | awk '{print $1}')
       install_cmd=$(echo $line | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')
       pwd=$(pwd)
-      mkdir /tmp/veles.package 2> /dev/null
-      rm -r /tmp/veles.package/*
+      rm -rf /tmp/veles.package
+      mkdir /tmp/veles.package
       cd /tmp/veles.package
       git clone "${repo}"
       cd $(basename "${repo}")
