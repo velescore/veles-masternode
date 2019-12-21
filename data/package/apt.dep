@@ -1,8 +1,10 @@
 ## Packages that needs to be installed through apt
+# Keep an empty line at the end
 build-essential
 autoconf
 libtool
 wget
+git
 supervisor
 ufw
 sslh
