@@ -141,6 +141,7 @@ install_apt_deps() {
     echo " * Nothing to install, all apt dependencies satisfied"
   else
     echo " * Installing following apt packages: ${to_install}"
+    apt-get update
     apt-get install --no-install-recommends -y ${to_install}
   fi
 

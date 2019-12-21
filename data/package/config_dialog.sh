@@ -58,6 +58,7 @@ wiz_message() {
 }
 
 install_dialog_deps() {
+	apt-get update
 	if ! dpkg --get-selections | grep "gawk" > /dev/null; then
 		echo " * Installing dependencies: gawk ..."
 		apt-get install --no-install-recommends -y gawk
@@ -73,6 +74,10 @@ install_dialog_deps() {
 	if ! dpkg --get-selections | grep "dialog" > /dev/null; then
 		echo " * Installing dependencies: dialog ..."
 		apt-get install --no-install-recommends -y dialog
+	fi
+	if ! dpkg --get-selections | grep "dnsutils" > /dev/null; then
+		echo " * Installing dependencies: dnsutils ..."
+		apt-get install --no-install-recommends -y dnsutils
 	fi
 }
 
@@ -134,8 +139,15 @@ find_signing_key() {
 }
 
 find_public_ip() {
-	ip=$(dig @resolver1.opendns.com ANY myip.opendns.com +short)
+	ip=$( dig @resolver1.opendns.com ANY myip.opendns.com +short )
 
+	if valid_ip "${ip}"; then
+		echo "${ip}" | head -n 1
+		return 0
+	fi
+
+	ip=$( host myip.opendns.com resolver1.opendns.com | grep "myip.opendns.com has" | awk '{print $4}' )
+	
 	if valid_ip "${ip}"; then
 		echo "${ip}" | head -n 1
 		return 0
