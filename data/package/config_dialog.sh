@@ -147,7 +147,7 @@ find_public_ip() {
 	fi
 
 	ip=$( host myip.opendns.com resolver1.opendns.com | grep "myip.opendns.com has" | awk '{print $4}' )
-	
+
 	if valid_ip "${ip}"; then
 		echo "${ip}" | head -n 1
 		return 0
@@ -610,6 +610,8 @@ first_run_auto() {
 	if velesctl status | grep FATAL; then
 		echo 'Some of the services has failed to start, please check which ones on the following screen and see service logs in /var/log/veles/services.d for more information'
 		velesctl status
+		echo -e '\n\nTrace logs:\n'
+		cat /var/log/veles/services.d/*
 		exit 1
 	else
 		echo 'Veles Core Masternode 2nd gen. has been succesfully installed! Check your node status anytime by typing: "veles-cli -conf=/etc/veles/veles.conf masternode status" and the state of all sub-services using "velesctl status": '
