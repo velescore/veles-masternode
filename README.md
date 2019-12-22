@@ -14,13 +14,15 @@ About Masternodes
 Veles Masternodes are a backbone for multi-tiered Veles Network. Masternode is a dedicated Veles blockchain node (backed by monetary deposit 
 as a countermeasure against misuse) rewarded by the network consensus for reliably providing decentralized services. 
 
-Veles Masternode 2.0 [development/testing]
-------------------------------------------
-This is master branch of Veles Masternode generation 2, which is currently in development/testing until official release into production during Q1 2020, when Masternodes generation 1 will bephased out. (For current stable Veles Masternode implementation visit [Veles Masternode Installer](https://github.com/velescore/masternode-installer) to install Masternode gen 1.0.).This package provides full implementation of Veles Masternode with robust service layer designed to run dapps such as dVPN, including proccess manager and installation wizard.
+Veles Masternode 2.0 
+---------------------
+This is master branch of Veles Masternode generation 2, which is currently in development/testing phase. (For current stable Veles Masternode implementation visit [Veles Masternode 1.0 Installer](https://github.com/velescore/masternode-installer). This package provides full implementation of Veles Masternode with robust service layer designed to run dapps such as dVPN, with proccess manager and installation wizard.
 
 
 Installation Instructions and Notes
------------------------------
+-----------------------------------
+Installation is currently only supported on Ubuntu 18.04 LTS (Bionic Beaver) and Ubuntu 19.04 (Disco Dingo).
+
 1.  Clone the repository
 
         https://github.com/velescore/veles-masternode
