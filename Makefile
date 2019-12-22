@@ -3,24 +3,33 @@ SYSD_TOOL_URL=https://raw.githubusercontent.com/AltcoinBaggins/docker-systemctl-
 SCRIPT_URL=https://raw.githubusercontent.com/velescore/veles-masternode-install/master/masternode.sh
 DAEMON_NAME=velesd
 
+test_all:
+	@make test_install
+	@make test_env
+
 test_install:
 	@echo
-	make test_dependencies
+	make check_dependencies
 	@echo -n '[test_install] Running the masternode script ...'
 	./install.sh install --non-interactive
-	@echo '[test_install] Done: Masternode script finished with success.'
-	@echo -n '[test_install] Checking whether Veles Core daemon is running ... '
-	@ps aux | grep -v grep | grep velesd > /dev/null && echo 'success' || exit 1
-	@echo -e "[test_install] Done [success] \n"
+	@echo "[test_install] Done [success]"
 
-docker_test_install:
+test_env:	
+	make install_env_test_dependencies
+	@echo -n '[test_env] Checking whether Veles Core daemon is running ... '
+	@ps aux | grep -v grep | grep velesd > /dev/null && echo 'ok' || ( echo 'fail' ; exit 1 )
+	@echo -n '[test_env] Testing internet connection and DNS ... '
+	ping google.com -c 5 && echo 'ok' || ( echo -e "fail\n, DNS debug: " ; dig google.com ; exit 1 )
+	@echo "[test_env] Done [success]"
+
+docker_test_all:
 	@make install_docker_systemd
 	@echo -e "[docker_test_install] Preparing the testing evironment ... "
-	@make test_install
+	@make test_all
 	@echo -e "[docker_test_install] Done [success] \n"
 
-test_dependencies:
-	@echo '[test_dependencies] Starting the test ...'
+check_dependencies:
+	@echo '[check_dependencies] Starting the test ...'
 	@echo -n "Checking whether ifconfig command is present ... "
 	@command -v ifconfig >/dev/null 2>&1  && echo "yes" || echo "no"
 	@echo -n "Checking whether ip command is present ... "
@@ -43,12 +52,15 @@ test_dependencies:
 	@command -v yum >/dev/null 2>&1  && echo "yes" || echo "no"
 	@echo -n "Checking whether systemd is installed ... "
 	@command -v systemctl >/dev/null 2>&1  && echo 'yes' || (echo "no, but is required!" ; exit 1)
-	@echo -e "[test_dependencies] Done [success] \n"
+	@echo -e "[check_dependencies] Done [success] \n"
 
-install_assertion_tool:
+install_env_test_dependencies:
 	@echo '[test] Installing assertion toolkit ...'
 	@[ -f assert.sh ] || wget --quiet $(ASSERT_TOOL_URL) || exit 1
 	@[ -x assert.sh ] || chmod +x assert.sh || exit 1
+	@echo '[test] Installing iputils-ping ... '
+	@apt-get update
+	@apt-get install iputils-ping -y
 
 install_docker_systemd:
 	@echo '[test] Installing custom Docker systemd ...'

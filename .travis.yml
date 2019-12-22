@@ -9,8 +9,8 @@ jobs:
     - stage: test
       name: 'Ubuntu 18.04 LTS (Bionic Beaver)  [GOAL: install]'
       script:
-         - travis_retry sudo docker run --cap-add=NET_ADMIN --device=/dev/net/tun --rm=true -v `pwd`:/veles-masternode:rw ubuntu:18.04 /bin/bash -c "apt-get update ; apt-get install -q -y wget curl make procps python ; cd /veles-masternode/; make docker_test_install"
+         - travis_retry sudo docker run --cap-add=NET_ADMIN --device=/dev/net/tun --rm=true -v `pwd`:/veles-masternode:rw ubuntu:18.04 /bin/bash -c "apt-get update ; apt-get install -q -y wget curl make procps python ; cd /veles-masternode/; make docker_test_all"
     - stage: test
       name: 'Ubuntu 19.04 (Disco Dingo), update [GOAL: install] '
       script:
-         - travis_retry sudo docker run --cap-add=NET_ADMIN --device=/dev/net/tun --rm=true -v `pwd`:/veles-masternode:rw ubuntu:19.04 /bin/bash -c "apt-get update ; apt-get install -q -y wget curl make procps python ; cd /veles-masternode/; make docker_test_install"
+         - travis_retry sudo docker run --cap-add=NET_ADMIN --device=/dev/net/tun --rm=true -v `pwd`:/veles-masternode:rw ubuntu:19.04 /bin/bash -c "apt-get update ; apt-get install -q -y wget curl make procps python ; cd /veles-masternode/; make docker_test_all"

@@ -143,7 +143,7 @@ install_apt_deps() {
     echo " * Installing following apt packages: ${to_install}"
     # Update first, load the preconfigured choices
     apt-get update
-    apt-get install debconf-utils
+    apt-get install debconf-utils -y
     grep -v '#' package/apt.choices | debconf-set-selections
 
     # Install the packages

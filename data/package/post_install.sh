@@ -40,8 +40,10 @@ do_post_install() {
 
 	# Masquerade
 	pub_iface=$(ip route | grep default | awk '{print $5}')
-	sed -i "s/*filter$/\n# Added for Veles Code dVPN\n*nat\n:POSTROUTING ACCEPT [0:0]\n-A POSTROUTING -s 10.100.0.0\/8 -o ${pub_iface} -j MASQUERADE\nCOMMIT\n\n# Don't delete these required lines, otherwise there will be errors\n*filter/g" /etc/ufw/before.rules
-
+	if ! grep "\-A POSTROUTING \-s 10\." /etc/ufw/before.rules | grep " \-j MASQUERADE" > /dev/null; then
+		sed -i "s/*filter$/\n# Added for Veles Code dVPN\n*nat\n:POSTROUTING ACCEPT [0:0]\n-A POSTROUTING -s 10.100.0.0\/8 -o ${pub_iface} -j MASQUERADE\nCOMMIT\n\n# Don't delete these required lines, otherwise there will be errors\n*filter/g" /etc/ufw/before.rules
+	fi
+	
 	# Reload ufw
 	ufw disable
 	yes | ufw enable
