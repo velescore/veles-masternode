@@ -6,17 +6,12 @@ https://veles.network
 
 About Veles
 ------------
-Veles Core is open-source software project dedicated to development of technologies focused on privacy and freedom of access to an information, such as decentralized VPN provided by multi-tiered self-incentivized p2p network. Backed by custom blockchain that aims to overcome common issues
-associated with popular blockchains, such as 51% attack resistance, multiple PoW algorithms or dynamic block reward and halving system. Visit [Veles Core repository](https://github.com/velescore/veles) for more information.
+Veles Core is an open-source blockchain ecosystem providing services such as decentralized VPN in order to help people to defend their online privacy and free access to an information. 
+Backed by unique blockchain with features such dynamic block rewards and halving schedule, independent multi-algo PoW consensus, protected against common issues such as 51% attacks. Designed as multi-tiered network which builds on the concept of self-incentivized Masternodes which provide robust service and governance layer.
 
-About Masternodes
------------------
-Veles Masternodes are a backbone for multi-tiered Veles Network. Masternode is a dedicated Veles blockchain node (backed by monetary deposit 
-as a countermeasure against misuse) rewarded by the network consensus for reliably providing decentralized services. 
-
-Veles Masternode 2.0 
----------------------
-This is master branch of Veles Masternode generation 2, which is currently in development/testing phase. (For current stable Veles Masternode implementation visit [Veles Masternode 1.0 Installer](https://github.com/velescore/masternode-installer). This package provides full implementation of Veles Masternode with robust service layer designed to run dapps such as dVPN, with proccess manager and installation wizard.
+Veles Masternode Gen 2
+----------------------
+This is master branch of Veles Masternode 2nd generation, which is currently in development/testing phase. (For current stable Veles Masternode implementation visit [Veles Masternode Gen 1 Installer](https://github.com/velescore/masternode-installer). This package provides full implementation of Veles Masternode with robust service layer designed to run dapps such as dVPN, with proccess manager and installation wizard.
 
 
 Installation Instructions and Notes
