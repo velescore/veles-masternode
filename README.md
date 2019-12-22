@@ -1,6 +1,6 @@
 Veles Masternode integration/staging tree
 =========================================
-![Licence](https://img.shields.io/static/v1?label=License&message=GPL-3.0&color=green&style=for-the-badge)   ![Latest Release](https://img.shields.io/static/v1?label=Release&message=unreleased&color=blue&style=for-the-badge)
+![Licence](https://img.shields.io/github/license/velescore/masternode-installer?color=blue&style=for-the-badge)   ![Latest Release](https://img.shields.io/static/v1?label=Release&message=unreleased&color=blue&style=for-the-badge) ![Master Build Status](https://img.shields.io/travis/velescore/veles-masternode/master?style=for-the-badge)
 
 https://veles.network
 
