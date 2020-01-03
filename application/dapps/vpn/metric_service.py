@@ -78,7 +78,7 @@ class VPNMetricService(AbstractMetricService):
 			self.logger.debug('VPNMetricService::update_recent_metrics: No previous metric records found for interval ' + interval_name)
 			return
 
-		self.repo.store(prev_metrics_key, {
+		self.repo.store(cur_metrics_key, {
 			'interval_since': prev_time.isoformat().split('.')[0],	# remove miliseconds
 			'interval_until': now.isoformat().split('.')[0],
 			**self._compare_metrics(prev_metrics_state, cur_metrics_state)
