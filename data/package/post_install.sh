@@ -25,6 +25,12 @@ do_post_install() {
 	systemctl daemon-reload
 	systemctl restart systemd-resolved
 
+	# Make sure local dnsmasq doesn't affect our DNS server either,
+	# if it gets enabled for some reason.
+	sed -i 's/#port=/port=35353/g' /etc/dnsmasq.conf
+	sed -i 's/port=53/port=35353/g' /etc/dnsmasq.conf
+	systemctl restart dnsmasq
+
 	## Update netfilter and ufw rules
 	# Packet forwarding
 	sed -i 's/^[# ]*net.ipv4.ip_forward=.*$//g' /etc/sysctl.conf
