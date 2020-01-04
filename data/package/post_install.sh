@@ -18,6 +18,10 @@ do_post_install() {
 	## We need to update systemd config in order to disable local DNS blocking port 53
 	sed -i 's/#DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
 	sed -i 's/DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
+	# And make sure local DNS resolution works at all the times
+	sed -i 's/#DNS=/DNS=127.0.0.1 /g' /etc/systemd/resolved.conf
+	sed -i 's/#FallbackDNS=/FallbackDNS=1.1.1.1 8.8.8.8 1.0.0.1 8.8.4.4 /g' /etc/systemd/resolved.conf
+	# Make sure we reload systemd resolver settings
 	systemctl daemon-reload
 	systemctl restart systemd-resolved
 
