@@ -16,20 +16,28 @@ do_post_install() {
 	ln -s "/var/lib/veles/wallet/debug.log" "/var/log/veles/debug.log"
 
 	## We need to update systemd config in order to disable local DNS blocking port 53
-	sed -i 's/#DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
-	sed -i 's/DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
-	# And make sure local DNS resolution works at all the times
-	sed -i 's/#DNS=/DNS=127.0.0.1 /g' /etc/systemd/resolved.conf
-	sed -i 's/#FallbackDNS=/FallbackDNS=1.1.1.1 8.8.8.8 1.0.0.1 8.8.4.4 /g' /etc/systemd/resolved.conf
-	# Make sure we reload systemd resolver settings
-	systemctl daemon-reload
-	systemctl restart systemd-resolved
+	if [ -f /etc/systemd/resolved.conf ]; then
+		echo "Warning: /etc/systemd/resolved.conf not found!"
+
+		sed -i 's/#DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
+		sed -i 's/DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
+
+		# And make sure local DNS resolution works at all the times
+		sed -i 's/#DNS=/DNS=127.0.0.1 /g' /etc/systemd/resolved.conf
+		sed -i 's/#FallbackDNS=/FallbackDNS=1.1.1.1 8.8.8.8 1.0.0.1 8.8.4.4 /g' /etc/systemd/resolved.conf
+
+		# Make sure we reload systemd resolver settings
+		systemctl daemon-reload
+		systemctl restart systemd-resolved
+	fi
 
 	# Make sure local dnsmasq doesn't affect our DNS server either,
 	# if it gets enabled for some reason.
-	sed -i 's/#port=/port=35353/g' /etc/dnsmasq.conf
-	sed -i 's/port=53/port=35353/g' /etc/dnsmasq.conf
-	systemctl restart dnsmasq
+	if [ -f /etc/dnsmasq.conf ]; then
+		sed -i 's/#port=/port=35353/g' /etc/dnsmasq.conf
+		sed -i 's/port=53/port=35353/g' /etc/dnsmasq.conf
+		systemctl restart dnsmasq
+	fi
 
 	## Update netfilter and ufw rules
 	# Packet forwarding
