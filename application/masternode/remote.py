@@ -37,7 +37,7 @@ class RemoteMasternodeGateway(object):
 
 		try:
 			response = requests.get(url, headers=self.http_request_headers, verify=False, timeout=int(self.config['masternode'].get('query_timeout', 10)))
-		except requests.exceptions.ConnectionError as e:
+		except Exception as e:
 			self.logger.error('RemoteMasternodeGateway::query_dapp_status: Query error: ' + str(e))
 			error = 'Query error: ' + str(e)
 
