@@ -1,5 +1,4 @@
-""" Veles Masternode (gen 2) sync service """
-
+""" Gateway to communicate with remote masternode """
 import requests, json, time
 import version
 

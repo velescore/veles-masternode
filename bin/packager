@@ -262,7 +262,7 @@ mn_restore() {
 
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date >> $LOG_FILE
-  grep version ../application/version.py >> $LOG_FILE
+  grep version ../masternode/version.py >> $LOG_FILE
   pre_config_wizard "package/vars.cf" || exit 0
   wiz_info_tiny "Installing dependencies ..."
   install_deps >> $LOG_FILE 2>&1
@@ -303,7 +303,7 @@ mn_restore_auto() {
 
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date
-  grep version ../application/version.py
+  grep version ../masternode/version.py
   pre_config_auto "package/vars.cf"   || exit 0
   echo "[auto] Installing dependencies ..."
   install_deps
@@ -412,7 +412,7 @@ copy_app() {
     rm -rf "${app_dir}"
   fi
   mkdir -p "${app_dir}"
-  cp -av ${package_dir}/application/* ${app_dir}/   
+  cp -av ${package_dir}/masternode/* ${app_dir}/   
   cp -av ${package_dir}/bin/run-job ${libexec_dir}/
 }
 

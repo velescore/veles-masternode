@@ -3,8 +3,11 @@
 
 import appcontext, appconfig, logging
 from dependency_injector import containers, providers
+
+import mnsync_service
+import signing_service
+import remote_gateway
 from blockchain import core_node_service
-from masternode import mnsync_service, signing_service, remote
 from jobs import discovery_daemon, metric_daemon, web_server
 from controllers import masternode_status, masternode_list
 from dapps import registry
@@ -53,7 +56,7 @@ class IocContainer(containers.DeclarativeContainer):
             )
         } 
     masternode_gateway = providers.Singleton(
-        remote.RemoteMasternodeGateway,
+        remote_gateway.RemoteMasternodeGateway,
         config=app_config,
         logger=logger
     )
