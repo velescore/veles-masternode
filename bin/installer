@@ -1,5 +1,5 @@
 #!/bin/bash
-# Makes package from dev machine to files directory
+# Makes install from dev machine to files directory
 #export ROOT_PREFIX=""  # could be "" for /, "/srv", "/var/local" ...
 #export DIST_PREFIX="/root/veles-masternode/dist"
 #LOG_FILE="./velesmn-install.log"
@@ -19,7 +19,7 @@ unparse_ports() {
       #echo -e "${port} => {{svc-port:${service}}}"
       find "${DIST_PREFIX}" -type f -iname "*.*" -exec sed -i "s/${port}/{{svc-port:${service}}}/" "{}" +;
     fi
-        done < package/ports.cf
+        done < install/ports.cf
 }
 
 parse_ports() {
@@ -31,7 +31,7 @@ parse_ports() {
       #echo -e "{{svc-port:${service}}} => ${port}"
       find "${DIST_PREFIX}" -type f -iname "*.*" -exec sed -i "s/{{svc-port:${service}}}/${port}/" "{}" +;
     fi
-        done < package/ports.cf
+        done < install/ports.cf
 }
 
 unparse_users() {
@@ -43,7 +43,7 @@ unparse_users() {
       #echo "${user} => {{svc-user:${service}}}"
                         find "${DIST_PREFIX}" -type f -iname "*.*" -exec sed -i "s/${user}/{{svc-user:${service}}}/" "{}" +;
                 fi
-        done < package/users.cf
+        done < install/users.cf
 }
 
 parse_users() {
@@ -55,7 +55,7 @@ parse_users() {
       #echo "{{svc-user:${service}}} => ${user}"
                         find "${DIST_PREFIX}" -type f -iname "*.*" -exec sed -i "s/{{svc-user:${service}}}/${user}/" "{}" +;
                 fi
-        done < package/users.cf
+        done < install/users.cf
 }
 
 install_users() {
@@ -67,7 +67,7 @@ install_users() {
       #echo "+ ${user}"
       useradd -d "${ROOT_PREFIX}var/lib/veles" -c "${service}" "${user}"
                 fi
-        done < package/users.cf
+        done < install/users.cf
 }
 
 parse_vars() {
@@ -79,7 +79,7 @@ parse_vars() {
       #echo -e "{{${name}}} => ${value}"
       find "${DIST_PREFIX}" -type f -iname "*.*" -exec sed -i "s/{{${name}}}/${value}/" "{}" +;
     fi
-        done < package/vars.cf
+        done < install/vars.cf
 
   # Parse other kind of vars
   parse_ports
@@ -95,7 +95,7 @@ unparse_vars() {
       #echo -e "${value} => {{${name}}}"
       find "${DIST_PREFIX}" -type f -iname "*.*" -exec sed -i "s/${value}/{{${name}}}/" "{}" +;
     fi
-        done < package/vars.cf
+        done < install/vars.cf
 
   # Parse other kind of vars
   unparse_ports
@@ -114,7 +114,7 @@ apply_privileges() {
       chmod -R "${mode}" "${file}"
       chown -R "${owner}" "${file}"
                 fi
-      done < package/privileges.list
+      done < install/privileges.list
 }
 
 install_apt_deps() {
@@ -135,18 +135,18 @@ install_apt_deps() {
       to_install="${to_install} ${line}"
       echo "no"
     fi
-  done < package/apt.dep
+  done < install/apt.dep
 
   if [ "${to_install}" == "" ]; then
     echo " * Nothing to install, all apt dependencies satisfied"
   else
-    echo " * Installing following apt packages: ${to_install}"
+    echo " * Installing following apt installs: ${to_install}"
     # Update first, load the preconfigured choices
     apt-get update
     apt-get install debconf-utils -y
-    grep -v '#' package/apt.choices | debconf-set-selections
+    grep -v '#' install/apt.choices | debconf-set-selections
 
-    # Install the packages
+    # Install the installs
     apt-get install --no-install-recommends -y ${to_install}
   fi
 
@@ -168,7 +168,7 @@ install_apt_deps() {
       systemctl stop "${line}"
       systemctl disable "${line}"
     fi
-  done < package/apt.dep
+  done < install/apt.dep
 }
 
 install_pip3_deps() {
@@ -187,10 +187,10 @@ install_pip3_deps() {
       echo "yes"
     else
       echo "no"
-      echo " * Installing python3 package ${line}"
+      echo " * Installing python3 install ${line}"
       pip3 install "${line}"
     fi
-        done < package/pip3.dep
+        done < install/pip3.dep
 }
 
 install_git_deps() {
@@ -203,15 +203,15 @@ install_git_deps() {
       repo=$(echo $line | awk '{print $1}')
       install_cmd=$(echo $line | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')
       pwd=$(pwd)
-      rm -rf /tmp/veles.package
-      mkdir /tmp/veles.package
-      cd /tmp/veles.package
+      rm -rf /tmp/veles.install
+      mkdir /tmp/veles.install
+      cd /tmp/veles.install
       git clone "${repo}"
       cd $(basename "${repo}")
       bash -c "${install_cmd}"
       cd "$pwd"
-    done < package/git.dep
-    rm -r /tmp/veles.package
+    done < install/git.dep
+    rm -r /tmp/veles.install
 }
 
 install_deps() {
@@ -221,7 +221,7 @@ install_deps() {
 }
 
 pre_install() {
-  source package/pre_install.sh
+  source install/pre_install.sh
   do_pre_install
 }
 
@@ -230,7 +230,7 @@ post_install() {
   export DIST_PREFIX="${ROOT_PREFIX}"
 
   # Start post-install scripts
-  source package/post_install.sh
+  source install/post_install.sh
   do_post_install
 }
 
@@ -251,19 +251,19 @@ launch_service() {
 mn_backup() {
   git rm -r "${DIST_PREFIX}"
   mkdir "${DIST_PREFIX}"
-  copy_package "${ROOT_PREFIX}" "${DIST_PREFIX}" "backup"
+  copy_install "${ROOT_PREFIX}" "${DIST_PREFIX}" "backup"
   unparse_vars
 }
 
-mn_restore() {
+mn_extract() {
   PWD=$( pwd )
   cd ${DATA_DIR}
-  source "package/config_dialog.sh"
+  source "install/config_dialog.sh"
 
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date >> $LOG_FILE
   grep version ../masternode/version.py >> $LOG_FILE
-  pre_config_wizard "package/vars.cf" || exit 0
+  pre_config_wizard "install/vars.cf" || exit 0
   wiz_info_tiny "Installing dependencies ..."
   install_deps >> $LOG_FILE 2>&1
   wiz_info_tiny "Installing latest Veles Core ..."
@@ -277,7 +277,7 @@ mn_restore() {
   wiz_info_tiny "Preparing installation files ..."
   pre_install >> $LOG_FILE 2>&1 # | wiz progress
   wiz_info_tiny "Copying system files ..."
-  copy_package "${DIST_PREFIX}" "${ROOT_PREFIX}" "restore" >> $LOG_FILE 2>&1 #| wiz_progress
+  copy_install "${DIST_PREFIX}" "${ROOT_PREFIX}" "extract" >> $LOG_FILE 2>&1 #| wiz_progress
   wiz_info "Generating new certificates ..."
   post_install  #| wiz progress
   wiz_info_tiny "Copying application files ..."
@@ -294,17 +294,17 @@ mn_restore() {
   cd ${PWD}
 }
 
-# Same as mn_restore but without user interaction, we need to make sure
-# that steps below are exactly tha same as in mn_restore
-mn_restore_auto() {
+# Same as mn_extract but without user interaction, we need to make sure
+# that steps below are exactly tha same as in mn_extract
+mn_extract_auto() {
   PWD=$( pwd )
   cd ${DATA_DIR}
-  source "package/config_dialog.sh"
+  source "install/config_dialog.sh"
 
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date
   grep version ../masternode/version.py
-  pre_config_auto "package/vars.cf"   || exit 0
+  pre_config_auto "install/vars.cf"   || exit 0
   echo "[auto] Installing dependencies ..."
   install_deps
   echo "[auto] Installing latest Veles Core ..."
@@ -318,7 +318,7 @@ mn_restore_auto() {
   echo "[auto] Preparing installation files ..."
   pre_install # | wiz progress
   echo "[auto] Copying system files ..."
-  copy_package "${DIST_PREFIX}" "${ROOT_PREFIX}" "restore" #| wiz_progress
+  copy_install "${DIST_PREFIX}" "${ROOT_PREFIX}" "extract" #| wiz_progress
   echo "[auto] Generating new certificates ..."
   post_install  #| wiz progress
   echo "[auto] Copying application files ..."
@@ -366,10 +366,10 @@ cleanup_system() {
     if [[ $path != '' ]] && [[ $path != '.' ]] && [[ $path != '..' ]]; then
       rm -rf "$path"
     fi
-  done < package/cleanup.list  
+  done < install/cleanup.list  
 }
 
-copy_package() {
+copy_install() {
   src_prefix="${1}"
   dst_prefix="${2}"
   mode="${3}"
@@ -382,16 +382,16 @@ copy_package() {
       mkdir -p $(dirname "${dst_prefix}${path}") > /dev/null
       cp -av "${src_prefix}${path}" $(dirname "${dst_prefix}${path}")
     fi
-  done < package/package.list
+  done < install/install.list
 
   while read path; do
-  # if we're creating new package, remove what needs to be excluded
+  # if we're creating new install, remove what needs to be excluded
   # we need to do this because we use recursive cp copy. And speed
   # for a development script that takes about a second is no issue
     if [[ "${3}" == "backup" ]]; then
       rm -r "${dst_prefix}${path}" 2> /dev/null
     fi
-  done < package/exclude.list
+  done < install/exclude.list
 
   while read path; do
     if [ "${path}" == "" ] || [ "${path}" == "/" ] || [ "${path}" == "." ]; then
@@ -399,11 +399,11 @@ copy_package() {
     fi
     mkdir -p "${dst_prefix}${path}" 2> /dev/null
 
-  done < package/empty-dirs.list
+  done < install/empty-dirs.list
 }
 
 copy_app() {
-  package_dir="${1}"
+  install_dir="${1}"
   app_dir="/usr/lib/veles/masternode"
   libexec_dir="/usr/libexec/veles"
 
@@ -412,35 +412,69 @@ copy_app() {
     rm -rf "${app_dir}"
   fi
   mkdir -p "${app_dir}"
-  cp -av ${package_dir}/masternode/* ${app_dir}/   
-  cp -av ${package_dir}/bin/run-job ${libexec_dir}/
+  cp -av ${install_dir}/masternode/* ${app_dir}/   
+  cp -av ${install_dir}/bin/run-job ${libexec_dir}/
+}
+
+show_logo() {
+  echo " ____   ____     .__                _________                       
+_\___\_/___/____ |  |   ____   _____\_   ___ \  ___________   ____  
+\___________/__ \|  | _/ __ \ /  ___/    \  \/ /  _ \_  __ \_/ __ \ 
+   \  Y  /\  ___/|  |_\  ___/ \___ \\     \___(  <_> )  | \/\  ___/ 
+    \___/  \___  >____/\___  >____  >\______  /\____/|__|    \___  >
+               \/          \/     \/        \/                   \/ "
 }
 
 show_help() {
-  echo "Veles Masternode environment packager and installator"
-  echo -e "Usage: packager [action]\n\nActions:"
-  echo -e "install\t\t\tinstalls Veles MN system package to local system"
-  echo -e "\nDebugging actions:\nparse_vars\t\\treplace template variables to real values in package"
-  echo -e "unparse_vars\t\treplace real values to template variables in package"
-  echo -e "install_users\t\tadds neccessary user accounts"
-  echo -e "apply_privileges\tapplies needed file/directory permissions and ownership"
+  show_logo
+  echo -e ${1}
+  echo -e "\nUsage: install.sh [action]\n\nActions:"
+  echo -e "install (default)\tinstall Veles Masternode onto this system,"
+  echo -e "\t\t\treinstall or update existing installation"
+  echo -e "version\t\t\tprint version number and exit"
+  echo -e "help\t\t\tshow this help and exit"
 }
 
-if [ "$#" -ne 1 ] || [ "$1" == "--help" ]; then
+show_intro() {
+  show_logo
+  echo "[ Welcome to Veles Core Masternode Installator ]"
+  sleep 1
+}
+
+
+##
+#  Main
+##
+if [ "$#" -lt 1 ] || [ "$1" == "--help" ]; then
   show_help
   exit 0
 fi
 
-# Need env vras set for everything except printing help
+# Ensure env vars set for every action except printing help
 check_env
 
-if [ "$1" == "install" ]; then
-  if [[ "${NON_INTERACTIVE}" == 1 ]]; then
-    mn_restore_auto
-  else
-    mn_restore
-  fi
+if [ "$2" == "--non-interactive" ]; then
+  export NON_INTERACTIVE=1
+fi
 
+if [ "$1" == "" ] || [ "$1" == "install" ]; then
+  show_intro
+  # Save current path, extract later
+  PWD=$( pwd )
+  cd ${DATA_DIR}
+  if [[ "${NON_INTERACTIVE}" == 1 ]]; then
+    mn_extract_auto
+  else
+    mn_extract
+  fi
+  cd ${PWD}
+elif [ "$1" == "--help" ] || [ "$1" == "help" ]; then
+  show_help
+
+elif [ "$1" == "version" ] || [ "$1" == "--version" ]; then
+  cat masternode/version.py | grep version | grep -v '"""'
+
+# Undocmented arguments for testing and development
 elif [ "$1" == "make_install" ]; then
   mn_backup
 
@@ -472,5 +506,5 @@ elif [ "$1" == "install_deps" ]; then
   install_deps
 
 else
-  show_help
+  show_help "\nError: Unknown action: ${1}"
 fi

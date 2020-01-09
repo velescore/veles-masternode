@@ -10,7 +10,7 @@ easyrsa_install_ca() {
 	if [ ! -f /usr/share/veles/easy-rsa/vars ] && [ -f /usr/share/veles/easy-rsa/vars.example ]; then
 		cp -a /usr/share/veles/easy-rsa/vars.example /usr/share/veles/easy-rsa/vars
 	fi
-	source package/easy-rsa/patch_vars.sh
+	source install/easy-rsa/patch_vars.sh
 
 	# Save current path and enter easy-rsa directory
 	pwd=$(pwd)

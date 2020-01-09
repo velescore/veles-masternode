@@ -78,7 +78,7 @@ do_post_install() {
         fi
 
         ## Install Veles CA, generate and copy server certificates
-	source package/easy-rsa/install_ca.sh
+	source install/easy-rsa/install_ca.sh
 
 	# Restore current path, just for case
 	cd "$pwd"
