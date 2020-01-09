@@ -3,6 +3,28 @@ SYSD_TOOL_URL=https://raw.githubusercontent.com/AltcoinBaggins/docker-systemctl-
 SCRIPT_URL=https://raw.githubusercontent.com/velescore/veles-masternode-install/master/masternode.sh
 DAEMON_NAME=velesd
 
+PACKAGE_DIR := $(shell pwd -P)
+DATA_DIR := $(shell echo "${PACKAGE_DIR}/data")
+ROOT_PREFIX := /
+DIST_PREFIX := $(shell echo "${DATA_DIR}/dist")
+LOG_FILE := /tmp/velesmn-install.log
+CORE_RELEASE_URL := https://github.com/velescore/veles/releases/download/v0.18.1.3/veles-0.18.1.3-generic-linux-amd64.tar.gz
+CORE_RELEASE_DIR := veles-linux-amd64
+
+export PACKAGE_DIR
+export DATA_DIR
+export ROOT_PREFIX
+export DIST_PREFIX
+export LOG_FILE
+export CORE_RELEASE_URL
+export CORE_RELEASE_DIR
+
+install:
+	bin/installer install
+
+auto_install:
+	bin/installer install --non-interactive
+
 test_all:
 	@make test_install
 	@make test_env
@@ -12,7 +34,7 @@ test_install:
 	@echo
 	make check_dependencies
 	@echo -n '[test_install] Running the masternode script ...'
-	./install.sh install --non-interactive
+	make auto_install
 	@echo "[test_install] Done [success]"
 
 test_env:	

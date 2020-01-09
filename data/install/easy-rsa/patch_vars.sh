@@ -1,6 +1,6 @@
 # Patches EasyRSA config with custom vars
 RSA_VARS_FILE="/usr/share/veles/easy-rsa/vars"
-CF_VARS_FILE="./package/easy-rsa/vars.cf"
+CF_VARS_FILE="./install/easy-rsa/vars.cf"
 
 patch_easyrsa2_vars() {
 	rsa_vars=$1
