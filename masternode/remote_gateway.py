@@ -25,6 +25,11 @@ class RemoteMasternodeGateway(object):
 
 	def webapi_query(self, ip, method = 'status', argument = None):
 		""" Sends API query over HTTPS GET request to remote masternode """
+
+		# If we're trying to contact our own server IP, use localhost to avoid routing issues
+		if ip == self.config['masternode'].get('server_addr', ''):
+			ip = '127.0.0.1'
+
 		if argument:
 			url = 'https://%s/%s/%s/%s' % (ip, self.webapi_base_uri, method, argument)
 		else:
