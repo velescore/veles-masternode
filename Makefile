@@ -10,6 +10,7 @@ DIST_PREFIX := $(shell echo "${DATA_DIR}/dist")
 LOG_FILE := /tmp/velesmn-install.log
 CORE_RELEASE_URL := https://github.com/velescore/veles/releases/download/v0.18.1.3/veles-0.18.1.3-generic-linux-amd64.tar.gz
 CORE_RELEASE_DIR := veles-linux-amd64
+DEBIAN_FRONTEND := noninteractive
 
 export PACKAGE_DIR
 export DATA_DIR
@@ -18,6 +19,7 @@ export DIST_PREFIX
 export LOG_FILE
 export CORE_RELEASE_URL
 export CORE_RELEASE_DIR
+export DEBIAN_FRONTEND
 
 install:
 	bin/installer install

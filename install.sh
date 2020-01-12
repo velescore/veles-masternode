@@ -1,7 +1,14 @@
 #!/bin/bash
-echo "Warning: Installation by calling install.sh is deprecated and will be removed in next version."
-echo "New installation method: make install"
-echo -n "Starting in 5 seconds "
-sleep 1 ; echo -n "." ; sleep 1 ; echo -n "." ; sleep 1 ; echo -n "." ; echo -n "." ; sleep 1 ; echo -n "." ;
+echo -e "Preparing Veles Masternode installation ...\n"
+echo -n "* Checking whether netstat command is present ... "
+
+if command -v netstat >/dev/null 2>&1; then
+  echo "yes"
+else
+  echo "no"
+  apt-get update
+  apt-get install make
+fi
+
 cd $(dirname $0)
 make install
