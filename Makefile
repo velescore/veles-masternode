@@ -10,7 +10,6 @@ DIST_PREFIX := $(shell echo "${DATA_DIR}/dist")
 LOG_FILE := /tmp/velesmn-install.log
 CORE_RELEASE_URL := https://github.com/velescore/veles/releases/download/v0.18.1.3/veles-0.18.1.3-generic-linux-amd64.tar.gz
 CORE_RELEASE_DIR := veles-linux-amd64
-DEBIAN_FRONTEND := noninteractive
 
 export PACKAGE_DIR
 export DATA_DIR
@@ -19,7 +18,6 @@ export DIST_PREFIX
 export LOG_FILE
 export CORE_RELEASE_URL
 export CORE_RELEASE_DIR
-export DEBIAN_FRONTEND
 
 install:
 	bin/installer install
@@ -94,6 +92,8 @@ install_env_test_dependencies:
 
 install_docker_systemd:
 	@echo '[test] Installing custom Docker systemd ...'
+	@apt-get update
+	@apt-get install -qy docker wget python
 	@[ -f systemctl.py ] || wget --quiet $(SYSD_TOOL_URL) || exit 1
 	@[ -x systemctl.py ] || chmod +x systemctl.py || exit 1
 	@mv systemctl.py /usr/bin/systemctl || exit 1

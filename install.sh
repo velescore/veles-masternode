@@ -7,8 +7,20 @@ if command -v netstat >/dev/null 2>&1; then
 else
   echo "no"
   apt-get update
-  apt-get install make
+  apt-get install -yq make
 fi
 
 cd $(dirname $0)
-make install
+
+if [[ "${1}" == "--non-interactive" ]]; then
+  make auto_install
+else
+  make install
+fi
+
+if [[ "${1}" == "--docker-test" ]]; then
+  make docker_test_all
+else
+  make install
+fi
+

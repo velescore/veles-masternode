@@ -143,11 +143,11 @@ install_apt_deps() {
     echo " * Installing following apt installs: ${to_install}"
     # Update first, load the preconfigured choices
     apt-get update
-    apt-get install debconf-utils -y
+    apt-get install debconf-utils -yq
     grep -v '#' install/apt.choices | debconf-set-selections
 
     # Install the installs
-    apt-get install --no-install-recommends -y ${to_install}
+    apt-get install --no-install-recommends -yq ${to_install}
   fi
 
   # Ensure pre-installed services doesn't start after boot,
@@ -454,7 +454,10 @@ fi
 check_env
 
 if [ "$2" == "--non-interactive" ]; then
+  # Internal var
   export NON_INTERACTIVE=1
+  # Ensures non-onteractive mode for apt-get, dpkg, ...
+  export DEBIAN_FRONTEND=noninteractive
 fi
 
 if [ "$1" == "" ] || [ "$1" == "install" ]; then
