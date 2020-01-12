@@ -41,26 +41,13 @@ test_env:
 	make install_env_test_dependencies
 	@echo -n '[test_env] Checking whether Veles Core daemon is running ... '
 	@ps aux | grep -v grep | grep velesd > /dev/null && echo 'ok' || ( echo 'fail' ; exit 1 )
-	@echo -n '[test_env] Testing internet connection and DNS ... '
-	ping google.com -c 5 && echo 'ok' || ( echo -e "fail\n, DNS debug: " ; dig google.com ; exit 1 )
+	@echo -n '[test_env] Testing internet connection and DNS resolution ... '
+	ping veles.network -c 5 && echo 'ok' || ( echo -e "fail\n, DNS debug: " ; dig google.com ; exit 1 )
 	@echo "[test_env] Done [success]"
 
 test_dns:
-	@echo -n '[test_dns] Checking DNS settings ...'
-	@echo -n 'Checking /etc/systemd/resolved.conf ... '
-	@if [ -f /etc/systemd/resolved.conf ]; then\
-		grep "DNSStubListener=no" /etc/systemd/resolved.conf || ( echo 'fail' ; cat /etc/systemd/resolved.conf ; exit 1 );\
-		grep "DNS=127\.0\.0\.1" /etc/systemd/resolved.conf || ( echo 'fail' ; cat /etc/systemd/resolved.conf ; exit 1 );\
-		echo "ok";\
-	else\
-		echo "not present";\
-	fi
-	@echo -n 'Checking /etc/dnsmasq.conf ... '
-	@if [ -f /etc/dnsmasq.conf ]; then\
-		grep "port=53" /etc/dnsmasq.conf && ( echo 'fail' ; cat /etc/dnsmasq.conf ; exit 1 ) || echo "ok";\
-	else\
-		echo "not present";\
-	fi
+	@echo -n '[test_dns] Testing DNS server ...'
+	nslookup veles.network 10.100.0.1
 	@echo "[test_dns] Done [success]"
 
 docker_test_all:
