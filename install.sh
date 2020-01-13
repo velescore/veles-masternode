@@ -14,11 +14,7 @@ cd $(dirname $0)
 
 if [[ "${1}" == "--non-interactive" ]]; then
   make auto_install
-else
-  make install
-fi
-
-if [[ "${1}" == "--docker-test" ]]; then
+elif [[ "${1}" == "--docker-test" ]]; then
   make docker_test_all
 else
   make install
