@@ -15,6 +15,18 @@ do_post_install() {
 	touch /var/lib/veles/wallet/debug.log
 	ln -s "/var/lib/veles/wallet/debug.log" "/var/log/veles/debug.log"
 
+	## Update systemd resolver configuration
+	if [ -f /etc/systemd/resolved.conf ]; then
+		echo "Note: /etc/systemd/resolved.conf not present"
+
+		# Add fallback DNS servers in case of local resoliton fails
+		sed -i 's/#FallbackDNS=/FallbackDNS=1.1.1.1 8.8.8.8 1.0.0.1 8.8.4.4 /g' /etc/systemd/resolved.conf
+
+		# Make sure we reload systemd resolver settings
+		systemctl daemon-reload
+		systemctl restart systemd-resolved
+	fi
+
 	## Update netfilter and ufw rules
 	# Packet forwarding
 	sed -i 's/^[# ]*net.ipv4.ip_forward=.*$//g' /etc/sysctl.conf
