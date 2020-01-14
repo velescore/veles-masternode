@@ -1,8 +1,8 @@
 #!/bin/bash
 echo -e "Preparing Veles Masternode installation ...\n"
-echo -n "* Checking whether netstat command is present ... "
+echo -n "* Checking whether make command is present ... "
 
-if command -v netstat >/dev/null 2>&1; then
+if command -v make >/dev/null 2>&1; then
   echo "yes"
 else
   echo "no"
