@@ -39,7 +39,7 @@ class ConfigProvisioningController(AbstractSigningController):
 				"Content-Type": "application/x-openvpn-profile",
 				"Content-Disposition": "attachment; filename=veles.ovpn"
 				}
-		elif method == 'getOpenVPNShieldedConfig':
+		elif method == 'getOpenVPNShieldedConfig' or method == 'getShieldedOpenVPNConfig':	# todo: deprecate getShieldedOpenVPNConfig
 			text = str(self.config_service.make_openvpn_shielded_config(cert))
 			headers = {
 				"Content-Type": "application/openvpn",
