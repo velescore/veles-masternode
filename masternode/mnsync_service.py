@@ -11,7 +11,7 @@ class MasternodeSyncService(object):
 		self.core_node = core_node_service
 		self.logger = logger
 
-	def get_masternode_list(self, mode = None):
+	def get_masternode_list(self, mode = None, status_filter = None):
 		""" Returns masternode list, whether core or extended """
 		if mode == 'full':
 			core_list = self.get_core_masternode_list('full')
@@ -19,6 +19,10 @@ class MasternodeSyncService(object):
 
 			for ip, mn in stored_list.items():
 				if ip in core_list:
+					if status_filter and mn.status != status_filter:
+						del(stored_list[ip])
+						continue
+
 					if (mn.status == 'ACTIVE' and core_list[ip].status != 'ENABLED')\
 						or (not mn.status or mn.status != 'ACTIVE'):
 						mn.status = core_list[ip].status
@@ -41,13 +45,14 @@ class MasternodeSyncService(object):
 				if 'services_available' in mn.get_service_info().keys():
 					services_available =  mn.get_service_info()['services_available']
 
-				simple_list.add(MasternodeInfo({
-					'ip': mn.ip, 
-					'outpoint': mn.outpoint, 
-					'payee': mn.payee, 
-					'status': mn.status,
-					'services_available': services_available
-					}))
+				if not status_filter or status_filter == mn.status:
+					simple_list.add(MasternodeInfo({
+						'ip': mn.ip, 
+						'outpoint': mn.outpoint, 
+						'payee': mn.payee, 
+						'status': mn.status,
+						'services_available': services_available
+						}))
 
 			return simple_list
 
