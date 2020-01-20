@@ -35,6 +35,16 @@ class AbstractMetricService(object, metaclass=ABCMeta):
 		""" Calculates and updates metrics for the last specified time interval """
 		pass
 
+class AbstractGlobalMetricService(AbstractMetricService, metaclass=ABCMeta):
+	@abstractmethod
+	def get_global_metrics(self, interval_name):
+		""" Calculates and updates in database metrics for the last specified time interval """
+		pass
+	@abstractmethod
+	def update_global_metrics(self, interval_name):
+		""" Calculates and updates metrics for the last specified time interval """
+		pass
+
 class AbstractStatusService(object, metaclass=ABCMeta):
 	@abstractmethod
 	def get_dapp_status(self):

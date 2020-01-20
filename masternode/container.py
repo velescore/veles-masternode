@@ -90,6 +90,7 @@ class IocContainer(containers.DeclarativeContainer):
     # Repos/Services accessible for other provider classes
     metric_repository = repos['MetricRepository']
     mn_signing_service = services['MasternodeSigningService']
+    mn_sync_service = services['MasternodeSyncService']
 
     # Dapps
     dapp_registry = providers.Factory(
