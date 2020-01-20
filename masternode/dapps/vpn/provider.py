@@ -23,6 +23,8 @@ class dAppProvider(AbstractProvider):
 			config=self.container.app_config(), 
 			logger=self.container.logger(),
 			metric_repository=self.container.metric_repository(),
+			mnsync_service=self.container.mn_sync_service(),
+			mn_gateway=self.container.masternode_gateway(),
 			))
 		dapp_registry.register_service('VPNStatusService', status_service.VPNStatusService(
 			config=self.container.app_config(), 
