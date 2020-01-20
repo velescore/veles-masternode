@@ -14,7 +14,7 @@ CORE_VERSION="0.18.1.3"
 BACKTITLE="Veles Core Masternode Installation"	# ${MN_VERSION}/${CORE_VERSION}"
 TITLE="Veles Core Masternode"
 WALLET_DIR="/var/lib/veles/wallet"
-BACKUP_DIR="/var/lib/veles/wallet.backup"
+BACKUP_DIR="/root/veles-wallet-backup"
 
 function valid_ip()
 {
@@ -112,7 +112,7 @@ find_mn_key() {
 		echo $mnkey
 		return 0
 	fi
-	mnkey=$(cat /var/lib/veles/wallet.backup/veles.conf | grep masternodeprivkey | tail -n 1 | sed 's/masternodeprivkey=//g')
+	mnkey=$(cat ${BACKUP_DIR}/veles.conf | grep masternodeprivkey | tail -n 1 | sed 's/masternodeprivkey=//g')
 
 	if check_mn_key "${mnkey}"; then
 		echo $mnkey
