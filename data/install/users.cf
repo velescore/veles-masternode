@@ -5,5 +5,6 @@ velesmn-httpd		system.net.webServer
 velesmn-stunnel		system.net.tlsTunnel
 velesmn-obfs		service.vpn.obfsProxy
 velesmn-openvpn		service.vpn.openVPNServer
+velesmn-sss			service.vpn.shadowsocks
 velesmn-system		system
 

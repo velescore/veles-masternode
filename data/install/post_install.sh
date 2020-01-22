@@ -38,11 +38,13 @@ do_post_install() {
 
 	# Open neccessary ports
 	#ufw allow 22/tcp comment 'SSH [added by Veles MN]'	# done when service gets installed
+	# TODO: use ports conf or such source
 	ufw allow 53/tcp comment 'Veles Masternode dVPN: DNS'
 	ufw allow 53/udp comment 'Veles Masternode dVPN: DNS'
 	ufw allow 443/tcp comment 'Veles Masternode dVPN: HTTPS/multiprotocol'
 	ufw allow 443/udp comment 'Veles Masternode dVPN: HTTPS/multiprotocol'
 	ufw allow 21337/tcp comment 'Veles Masternode dVPN: Veles Core node'
+	ufw allow 21344 comment 'Veles Masternode dVPN: shadowsocks'
 
 	# Masquerade
 	pub_iface=$(ip route | grep default | awk '{print $5}')

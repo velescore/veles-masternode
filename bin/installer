@@ -211,13 +211,41 @@ install_git_deps() {
       bash -c "${install_cmd}"
       cd "$pwd"
     done < install/git.dep
-    rm -r /tmp/veles.install
+    rm -rf /tmp/veles.install
 }
 
 install_deps() {
   install_apt_deps
   install_pip3_deps
   install_git_deps
+}
+
+install_optionals() {
+  opts_file=$1
+
+  echo " * Checking dependencies for MN optionals ..."
+    pwd=$(pwd)
+ 
+    while read line; do
+      if $(echo $line | grep '#' > /dev/null); then
+        continue
+      fi
+
+      name=$(echo $line | awk '{print $1}')
+      install_cmd=$(echo $line | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+
+      # install if selected
+      if (cat "${opts_file}" | grep -v '#' | grep "${name}"); then
+        echo "   + Installing ${name} ..."
+        rm -rf /tmp/veles.install
+        mkdir /tmp/veles.install
+        cd /tmp/veles.install
+        bash -c "${install_cmd}"        
+      fi
+    done < install/optionals.dep
+
+    rm -rf /tmp/veles.install
+    cd "$pwd"
 }
 
 pre_install() {
@@ -263,7 +291,7 @@ mn_extract() {
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date >> $LOG_FILE
   grep version ../masternode/version.py >> $LOG_FILE
-  pre_config_wizard "install/vars.cf" || exit 0
+  pre_config_wizard "install/vars.cf" "install/optionals.cf" || exit 0
   wiz_info_tiny "Installing dependencies ..."
   install_deps >> $LOG_FILE 2>&1
   wiz_info_tiny "Installing latest Veles Core ..."
@@ -282,6 +310,8 @@ mn_extract() {
   post_install  #| wiz progress
   wiz_info_tiny "Copying application files ..."
   copy_app "${PACKAGE_DIR}" >> $LOG_FILE 2>&1
+  wiz_info_tiny "Installing optional MN services ..."
+  install_optionals "install/optionals.cf" >> $LOG_FILE 2>&1
   post_config_wizard || exit 0
   wiz_info_tiny "Setting up file privileges ..."
   apply_privileges | wiz_progress
@@ -304,7 +334,7 @@ mn_extract_auto() {
   echo "Starting Veles Masternode installation" > $LOG_FILE
   date
   grep version ../masternode/version.py
-  pre_config_auto "install/vars.cf"   || exit 0
+  pre_config_auto "install/vars.cf" "install/optionals.cf" || exit 0
   echo "[auto] Installing dependencies ..."
   install_deps
   echo "[auto] Installing latest Veles Core ..."
@@ -323,6 +353,8 @@ mn_extract_auto() {
   post_install  #| wiz progress
   echo "[auto] Copying application files ..."
   copy_app "${PACKAGE_DIR}"
+  wiz_info_tiny "Installing optional MN services ..."
+  install_optionals "install/optionals.cf" >> $LOG_FILE 2>&1
   post_config_auto || exit 0
   echo "[auto] Setting up file privileges ..."
   apply_privileges 
@@ -460,11 +492,12 @@ if [ "$2" == "--non-interactive" ]; then
   export DEBIAN_FRONTEND=noninteractive
 fi
 
+# Save current path, extract later
+PWD=$( pwd )
+cd ${DATA_DIR}
+
 if [ "$1" == "" ] || [ "$1" == "install" ]; then
   show_intro
-  # Save current path, extract later
-  PWD=$( pwd )
-  cd ${DATA_DIR}
   if [[ "${NON_INTERACTIVE}" == 1 ]]; then
     mn_extract_auto
   else
@@ -508,6 +541,12 @@ elif [ "$1" == "post_install" ]; then
 elif [ "$1" == "install_deps" ]; then
   install_deps
 
+elif [ "$1" == "install_optionals" ]; then
+  install_optionals "install/optionals.cf" 
+
 else
   show_help "\nError: Unknown action: ${1}"
 fi
+
+# Change previous path
+cd ${PWD}

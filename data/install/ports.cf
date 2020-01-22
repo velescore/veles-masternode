@@ -6,6 +6,7 @@
 21341	service.vpn.openVPNServer
 21442	service.vpn.openVPNServer:rpc
 21343	service.vpn.obfsProxy
+21344	service.vpn.shadowsocks
 21345	system.db.redisServer
 21351	velesctl:rpc
 #443	system.net.protocolMux
