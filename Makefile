@@ -20,7 +20,7 @@ export CORE_RELEASE_URL
 export CORE_RELEASE_DIR
 
 install:
-	bin/installer install
+	@if [[ "$(DEBUG)" == "" ]] ; then bin/installer install; else bin/installer "$(DEBUG)"; fi 
 
 auto_install:
 	bin/installer install --non-interactive
