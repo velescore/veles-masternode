@@ -294,7 +294,6 @@ mn_extract() {
   pre_config_wizard "install/vars.cf" "install/optionals.cf" || exit 0
   wiz_info_tiny "Installing dependencies ..."
   install_deps >> $LOG_FILE 2>&1
-  install_optionals "install/optionals.cf" >> $LOG_FILE 2>&1
   wiz_info_tiny "Installing latest Veles Core ..."
   install_daemon "${CORE_RELEASE_URL}" "${CORE_RELEASE_DIR}" >> $LOG_FILE 2>&1
   wiz_info_tiny "Preparing instalaltion files ..."
@@ -311,6 +310,8 @@ mn_extract() {
   post_install  #| wiz progress
   wiz_info_tiny "Copying application files ..."
   copy_app "${PACKAGE_DIR}" >> $LOG_FILE 2>&1
+  wiz_info_tiny "Installing optional MN services ..."
+  install_optionals "install/optionals.cf" >> $LOG_FILE 2>&1
   post_config_wizard || exit 0
   wiz_info_tiny "Setting up file privileges ..."
   apply_privileges | wiz_progress
@@ -336,7 +337,6 @@ mn_extract_auto() {
   pre_config_auto "install/vars.cf" "install/optionals.cf" || exit 0
   echo "[auto] Installing dependencies ..."
   install_deps
-  install_optionals "install/optionals.cf"
   echo "[auto] Installing latest Veles Core ..."
   install_daemon "${CORE_RELEASE_URL}" "${CORE_RELEASE_DIR}"
   echo "[auto] Preparing instalaltion files ..."
@@ -353,6 +353,8 @@ mn_extract_auto() {
   post_install  #| wiz progress
   echo "[auto] Copying application files ..."
   copy_app "${PACKAGE_DIR}"
+  wiz_info_tiny "Installing optional MN services ..."
+  install_optionals "install/optionals.cf" >> $LOG_FILE 2>&1
   post_config_auto || exit 0
   echo "[auto] Setting up file privileges ..."
   apply_privileges 

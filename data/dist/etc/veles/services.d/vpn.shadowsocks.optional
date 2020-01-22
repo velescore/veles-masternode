@@ -1,0 +1,7 @@
+[program:service.vpn.shadowsocks]
+command = /usr/local/bin/ssserver -p {{svc-port:service.vpn.shadowsocks}} -k ALPHA_TRIAL -m aes-256-cfb
+autorestart = true
+stopasgroup = true
+autostart = true
+startsecs = 15
+user = {{svc-user:service.vpn.shadowsocks}}
