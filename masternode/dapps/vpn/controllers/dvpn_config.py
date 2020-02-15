@@ -4,7 +4,7 @@ from controllers.interfaces import AbstractSigningController
 
 class ConfigProvisioningController(AbstractSigningController):
 	methods = ['getCertificate', 'getOpenVPNConfig', 'getOpenVPNShieldedConfig', 'getStunnelConfig', 'getStunnelCertificate', 
-		'getCACertificate', 'getAllConfigData']
+		 'getShadowsocksConfig', 'getCACertificate', 'getAllConfigData']
 
 	def __init__(self, config, logger, signing_service, certificate_service, config_service):
 		super().__init__(config, logger, signing_service)
@@ -57,6 +57,12 @@ class ConfigProvisioningController(AbstractSigningController):
 				"Content-Type": "application/openssl",
 				"Content-Disposition": "attachment; filename=stunnel.pem"
 				}
+		elif method == 'getShadowsocksConfig':
+			text = str(self.config_service.make_shadowsocks_config(cert))
+			headers = {
+				"Content-Type": "application/shadowsocks",
+				"Content-Disposition": "attachment; filename=veles.shadowsocks.json"
+				}		
 		elif method == 'getCACertificate':	# todo: finish - don't generate all the shit just fetch ca file
 			text = str(cert.ca_certificate)
 			headers = {
@@ -67,7 +73,8 @@ class ConfigProvisioningController(AbstractSigningController):
 			result = {
 				'certificate_data': cert.__dict__,
 				'openvpn_config': self.config_service.make_openvpn_config(cert),
-				'stunnel_config': self.config_service.make_stunnel_config(cert)
+				'stunnel_config': self.config_service.make_stunnel_config(cert),
+				'shadowsocks_config': self.config_service.make_shadowsocks_config(cert)
 			}
 		else:
 			return self.error_response('Unsupported method: {}'.format(method))
