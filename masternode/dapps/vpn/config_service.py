@@ -25,3 +25,8 @@ class ConfigProvisioningService(object):
 		with open(os.path.join(self.tpl_path, 'stunnel.client.conf'), 'r') as tpl_file:
 			tpl = tpl_file.read()
 		return str(tpl)
+
+	def make_shadowsocks_config(self, cert):
+		with open(os.path.join(self.tpl_path, 'shadowsocks.client.conf'), 'r') as tpl_file:
+			tpl = tpl_file.read()
+		return str(tpl)	
