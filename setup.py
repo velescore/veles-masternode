@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="veles-masternode",
-    version="1.99.2",
+    version="1.99.05",
     author="Veles Core",
     author_email="admin@veles.network",
     description="Veles Core Masternode",

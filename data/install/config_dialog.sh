@@ -9,7 +9,7 @@
 #   OR
 #      if valid_ip IP_ADDRESS; then echo good; else echo bad; fi
 #
-MN_VERSION="1.99.04"
+MN_VERSION="1.99.05"
 CORE_VERSION="0.18.1.3"
 BACKTITLE="Veles Core Masternode Installation"	# ${MN_VERSION}/${CORE_VERSION}"
 TITLE="Veles Core Masternode"
