@@ -317,6 +317,7 @@ mn_extract() {
   apply_privileges | wiz_progress
   wiz_info_tiny "Setting up systemd service ..."
   setup_service >> $LOG_FILE 2>&1
+  apply_privileges  # better safu than sorry
   wiz_info_tiny "Launching systemd service ..."
   launch_service >> $LOG_FILE 2>&1
   first_run_wizard || exit 0
