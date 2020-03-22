@@ -436,15 +436,12 @@ copy_install() {
 
 copy_app() {
   install_dir="${1}"
-  app_dir="/usr/lib/veles/masternode"
   libexec_dir="/usr/libexec/veles"
 
-  # Remove old copy if exists
-  if [ -d "${app_dir}" ]; then
-    rm -rf "${app_dir}"
-  fi
-  mkdir -p "${app_dir}"
-  cp -av ${install_dir}/masternode/* ${app_dir}/   
+  # Install the main app as a system-wide python module
+  cd ${1} && python3 setup.py install
+
+  # Copy the main executable that loads the python module to the libexec dir
   cp -av ${install_dir}/bin/run-job ${libexec_dir}/
 }
 

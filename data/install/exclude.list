@@ -1,5 +1,4 @@
 /etc/veles/vpn/keys
 /usr/share/veles/easy-rsa
-/usr/lib/veles/masternode
 /var/lib/veles/wallet
 /var/log/veles

@@ -2,9 +2,6 @@
 import sys
 
 import masternode
-
-#sys.path.append('/usr/lib/veles/masternode')
-
 from masternode.cli import MasternodeJobManagerCLI
 
 app = MasternodeJobManagerCLI()
