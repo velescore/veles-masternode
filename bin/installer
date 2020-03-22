@@ -444,6 +444,9 @@ copy_app() {
 
   # Copy the main executable that loads the python module to the libexec dir
   cp -av ${install_dir}/bin/run-job ${libexec_dir}/
+
+  # Restore the path
+  cd ${DATA_DIR}
 }
 
 show_logo() {
