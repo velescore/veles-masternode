@@ -9,7 +9,7 @@
 #   OR
 #      if valid_ip IP_ADDRESS; then echo good; else echo bad; fi
 #
-MN_VERSION="1.99.04"
+MN_VERSION="1.99.05"
 CORE_VERSION="0.18.1.3"
 BACKTITLE="Veles Core Masternode Installation"	# ${MN_VERSION}/${CORE_VERSION}"
 TITLE="Veles Core Masternode"
@@ -58,25 +58,27 @@ wiz_message() {
 }
 
 install_dialog_deps() {
+	echo -e "\n* Preparing the installator ..."
+	echo "  * Updating system package list..."
 	apt-get update
 	if ! dpkg --get-selections | grep "gawk" > /dev/null; then
-		echo " * Installing dependencies: gawk ..."
+		echo "  * Installing dependencies: gawk ..."
 		apt-get install --no-install-recommends -y gawk
 	fi
 	if ! dpkg --get-selections | grep "sed" > /dev/null; then
-		echo " * Installing dependencies: sed ..."
+		echo "  * Installing dependencies: sed ..."
 		apt-get install --no-install-recommends -y sed
 	fi
 	if ! dpkg --get-selections | grep "psmisc" > /dev/null; then
-		echo " * Installing dependencies: psmisc ..."
+		echo "  * Installing dependencies: psmisc ..."
 		apt-get install --no-install-recommends -y psmisc
 	fi
 	if ! dpkg --get-selections | grep "dialog" > /dev/null; then
-		echo " * Installing dependencies: dialog ..."
+		echo "  * Installing dependencies: dialog ..."
 		apt-get install --no-install-recommends -y dialog
 	fi
 	if ! dpkg --get-selections | grep "dnsutils" > /dev/null; then
-		echo " * Installing dependencies: dnsutils ..."
+		echo "  * Installing dependencies: dnsutils ..."
 		apt-get install --no-install-recommends -y dnsutils
 	fi
 }
@@ -186,9 +188,9 @@ pre_config_wizard() {
 		dialog --backtitle "${BACKTITLE}" --title "${TITLE} [Warning]" --yesno "${reinstall_msg}" 10 60 || return 1
 
 		# Stop all or running services
-		mn_dialog --infobox 'Stopping current Veles Core Masternode services...' 3 45
-		$( echo 'Stopping current Veles Core Masternode services' ; velesctl stop all ) | wiz_progress
-		systemctl stop veles-mn #| wiz_progress
+		mn_dialog --infobox 'Stopping Veles Core Masternode services...' 3 45
+		velesctl stop all > /dev/null
+		systemctl stop veles-mn  > /dev/null
 		# Just to be reallly sure
 		killall velesd 2> /dev/null
 		killall openvpn 2> /dev/null
