@@ -17,7 +17,7 @@ from .dapps import registry
 
 class IocContainer(containers.DeclarativeContainer):
     """Application IoC container."""
-    db_type = 'mem'
+    db_type = 'redis'
     config = providers.Configuration('config')
     logger = providers.Singleton(logging.Logger, name='VelesMasternode')
 
