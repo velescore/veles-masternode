@@ -24,7 +24,7 @@ Options:
 fi
 
 echo "Downloading Veles Masternode installer wizard ..."
-git clone https://github.com/AltcoinBaggins/masternode-installer2 /tmp/veles-masternode-installer
+git clone https://github.com/velescore/masternode-installer2 /tmp/veles-masternode-installer
 (export VELES_MN_SRC=$(dirname $0) ; /tmp/veles-masternode-installer/install.sh "${0}")
 rm -rf /tmp/veles-masternode-installer
 
