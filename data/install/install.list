@@ -1,6 +1,0 @@
-/etc/veles
-/etc/systemd/system/veles-mn.service
-/usr/libexec/veles
-/usr/share/veles
-/usr/bin/velesctl
-/var/lib/veles/web

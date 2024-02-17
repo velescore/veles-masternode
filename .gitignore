@@ -1,0 +1,5 @@
+build/
+dist/
+masternode/__pycache__/
+masternode/model/__pycache__/
+veles_masternode.egg-info/

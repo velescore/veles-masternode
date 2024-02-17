@@ -1,6 +1,0 @@
-/etc/veles/vpn/keys
-/usr/lib/veles
-/var/lib/veles/wallet
-/var/log/veles/services.d
-/var/log/veles/redis
-/var/lib/veles/redis

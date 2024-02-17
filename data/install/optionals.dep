@@ -1,3 +1,0 @@
-# Optional dependencies that have various installation methods
-# Name				Installation command
-shadowsocks 		pip3 uninstall shadowsocks -y 2> /dev/null; git clone https://github.com/velescore/shadowsox-patch ; cd shadowsox-patch ; make install ; cp /etc/veles/services.d/vpn.shadowsocks.optional /etc/veles/services.d/vpn.shadowsocks.conf
