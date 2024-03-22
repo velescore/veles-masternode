@@ -67,6 +67,12 @@ class AbstractController(object, metaclass=ABCMeta):
 	def add_json_headers(self, extra_headers, body=None):
 		return {**self.headers_common, **self.headers_json, **extra_headers}
 
+	def conf(self, key, default = None, section = 'webserver'):
+		try:
+			return self.config[section].get(key, default)
+		except:
+			return default
+
 
 class AbstractSigningController(AbstractController, metaclass=ABCMeta):
 	def __init__(self, config, logger, signing_service):

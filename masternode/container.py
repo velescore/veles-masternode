@@ -11,7 +11,7 @@ from . import signing_service
 from . import remote_gateway
 from .blockchain import core_node_service
 from .jobs import discovery_daemon, metric_daemon, web_server
-from .controllers import masternode_status, masternode_list
+from .controllers import masternode_status, masternode_list, masternode_dashboard
 from .dapps import registry
 
 
@@ -117,6 +117,16 @@ class IocContainer(containers.DeclarativeContainer):
             logger=logger,
             signing_service=services['MasternodeSigningService'],
             mnsync_service=services['MasternodeSyncService']
+        ),
+        # masternode_dashboard
+        # to use this
+        # class MasternodeDashboardController(AbstractController):
+        # def __init__(self, config, logger):
+        ##
+        'MasternodeDashboardController': providers.Factory(
+                masternode_dashboard.MasternodeDashboardController,   
+                config=app_config,
+                logger=logger
         )
     }
 
